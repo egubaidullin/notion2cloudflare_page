@@ -15,6 +15,11 @@ load_dotenv()
 NOTION_API_TOKEN = os.getenv('NOTION_API_TOKEN')
 NOTION_DATABASE_ID = os.getenv('NOTION_DATABASE_ID')
 
+# Проверка, что переменные окружения загружены
+if not NOTION_API_TOKEN or not NOTION_DATABASE_ID:
+    logging.error("Missing NOTION_API_TOKEN or NOTION_DATABASE_ID. Please check your environment variables.")
+    exit(1)
+
 # Инициализация клиента Notion
 notion = Client(auth=NOTION_API_TOKEN)
 
@@ -26,15 +31,20 @@ def get_notion_page():
         if not pages:
             raise ValueError("No pages found in the database.")
         logging.info(f"Successfully retrieved {len(pages)} pages from the database")
+        logging.info(f"Page ID: {pages[0]['id']}")
         return pages[0]  # Возвращаем первую страницу
     except APIResponseError as e:
         logging.error(f"Error querying Notion database: {e}")
+        raise
+    except Exception as e:
+        logging.error(f"Unexpected error: {e}")
         raise
 
 def convert_to_html(page):
     try:
         page_id = page['id']
         blocks = notion.blocks.children.list(block_id=page_id).get('results')
+        logging.info(f"Retrieved {len(blocks)} blocks from page {page_id}")
 
         soup = BeautifulSoup('<html><head></head><body></body></html>', 'html.parser')
         body = soup.body
@@ -70,6 +80,7 @@ def save_html(html, filename):
 
 def main():
     try:
+        logging.info("Starting Notion to HTML sync...")
         page = get_notion_page()
         html = convert_to_html(page)
         save_html(html, "index.html")
