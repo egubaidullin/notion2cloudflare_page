@@ -19,14 +19,41 @@ def get_notion_content():
 
 def parse_notion_content(html_content):
     soup = BeautifulSoup(html_content, 'html.parser')
+    
+    # Извлечение заголовка
     title = soup.find('title').text if soup.find('title') else 'Untitled'
+    
+    # Находим основной контейнер с контентом
     main_content = soup.find('div', class_='notion-page-content')
     
     if not main_content:
         logging.warning("Main content not found. The page structure might have changed.")
         return f"<h1>{title}</h1><p>Content could not be extracted.</p>"
-    
-    return f"<h1>{title}</h1>{main_content}"
+
+    content_html = f"<h1>{title}</h1>"
+
+    # Извлечение всех блоков контента
+    for block in main_content.find_all(['p', 'h1', 'h2', 'h3', 'ul', 'ol', 'img']):
+        if block.name == 'p':
+            content_html += f"<p>{block.text}</p>"
+        elif block.name.startswith('h'):
+            content_html += f"<{block.name}>{block.text}</{block.name}>"
+        elif block.name == 'ul':
+            content_html += "<ul>"
+            for li in block.find_all('li'):
+                content_html += f"<li>{li.text}</li>"
+            content_html += "</ul>"
+        elif block.name == 'ol':
+            content_html += "<ol>"
+            for li in block.find_all('li'):
+                content_html += f"<li>{li.text}</li>"
+            content_html += "</ol>"
+        elif block.name == 'img':
+            img_src = block['src'] if 'src' in block.attrs else ''
+            content_html += f'<img src="{img_src}" alt="Image"/>'
+
+    return content_html
+
 
 def save_to_file(parsed_content, filename="index.html"):
     with open(filename, 'w', encoding='utf-8') as f:
