@@ -21,6 +21,13 @@ jobs:
           python -m pip install --upgrade pip
           pip install requests python-dotenv notion-client beautifulsoup4
 
+      - name: Debug Environment Variables
+        run: |
+          echo "NOTION_DATABASE_ID length: ${#NOTION_DATABASE_ID}"
+          echo "NOTION_DATABASE_ID first 5 chars: ${NOTION_DATABASE_ID:0:5}"
+        env:
+          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+
       - name: Sync Notion to HTML
         env:
           NOTION_API_TOKEN: ${{ secrets.NOTION_API_TOKEN }}
@@ -32,6 +39,7 @@ jobs:
         run: |
           if [ ! -f "index.html" ]; then
             echo "index.html not found!"
+            cat sync_notion.log  # Вывод лога, если файл не создан
             exit 1
           fi
 
@@ -40,6 +48,6 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
-          curl -X POST "https://api.cloudflare.com/client/v4/accounts/${{ secrets.CLOUDFLARE_ACCOUNT_ID }}/pages/projects/CLOUDFLARE_PROJECT/deployments" \
+          curl -X POST "https://api.cloudflare.com/client/v4/accounts/${{ secrets.CLOUDFLARE_ACCOUNT_ID }}/pages/projects/${{ secrets.CLOUDFLARE_PROJECT }}/deployments" \
           -H "Authorization: Bearer ${{ secrets.CLOUDFLARE_API_TOKEN }}" \
           -F "file=@./index.html"
