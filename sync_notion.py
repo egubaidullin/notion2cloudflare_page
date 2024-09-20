@@ -36,7 +36,7 @@ def convert_to_html(page):
         soup = BeautifulSoup('<html><head></head><body></body></html>', 'html.parser')
         body = soup.body
 
-        title = page['properties']['Name']['title'][0]['plain_text']
+        title = page['properties'].get('Name', {}).get('title', [{}])[0].get('plain_text', 'Untitled')
         h1 = soup.new_tag('h1')
         h1.string = title
         body.append(h1)
@@ -70,7 +70,7 @@ def main():
         pages = get_notion_pages()
         for page in pages:
             html = convert_to_html(page)
-            title = page['properties']['Name']['title'][0]['plain_text']
+            title = page['properties'].get('Name', {}).get('title', [{}])[0].get('plain_text', 'Untitled')
             filename = f"{title.lower().replace(' ', '-')}.html"
             save_html(html, filename)
         logging.info("Sync completed successfully")
