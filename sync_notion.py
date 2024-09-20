@@ -1,4 +1,6 @@
 import requests
+import hashlib
+import json
 from bs4 import BeautifulSoup
 import logging
 import os
@@ -34,15 +36,34 @@ def parse_notion_content(html_content):
     
     return f"<h1>{title}</h1>{main_content}"
 
+def create_manifest(html_content):
+    # Создание манифеста с хешем файла
+    file_hash = hashlib.sha256(html_content.encode('utf-8')).hexdigest()
+    
+    manifest = {
+        "files": {
+            "/index.html": {
+                "path": "index.html",
+                "hash": file_hash
+            }
+        }
+    }
+    return manifest
+
 def publish_to_cloudflare(html_content):
     url = f"https://api.cloudflare.com/client/v4/accounts/{CLOUDFLARE_ACCOUNT_ID}/pages/projects/{CLOUDFLARE_PROJECT}/deployments"
     
     headers = {
         "Authorization": f"Bearer {CLOUDFLARE_API_TOKEN}",
+        "Content-Type": "multipart/form-data",
     }
 
+    # Создаем манифест
+    manifest = create_manifest(html_content)
+    
     files = {
-        'index.html': ('index.html', html_content, 'text/html')
+        'index.html': ('index.html', html_content, 'text/html'),
+        'manifest': (None, json.dumps(manifest), 'application/json')
     }
 
     try:
