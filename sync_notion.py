@@ -60,9 +60,10 @@ def publish_to_cloudflare(html_content):
         "Content-Type": "application/json"
     }
 
-    # Создаем манифест с SHA256 хешем для index.html
+    # Создаем SHA256 хеш для index.html
     file_hash = hashlib.sha256(html_content.encode('utf-8')).hexdigest()
     
+    # Формируем манифест с хэшом
     manifest = {
         "files": {
             "/index.html": {
@@ -71,18 +72,19 @@ def publish_to_cloudflare(html_content):
             }
         }
     }
-    
-    # Пакуем всё в JSON
+
+    # Формируем JSON данные для запроса
     data = {
-        "manifest": manifest,
+        "manifest": manifest,  # Манифест обязателен для деплоя
         "files": {
-            "index.html": html_content
+            "/index.html": html_content  # Контент HTML файла
         }
     }
 
     try:
+        # Отправляем запрос на деплой
         response = requests.post(url, headers=headers, json=data)
-        response.raise_for_status()
+        response.raise_for_status()  # Проверяем успешность запроса
         deployment = response.json()
         logging.info(f"Deployment successful. URL: {deployment['result']['url']}")
     except requests.RequestException as e:
