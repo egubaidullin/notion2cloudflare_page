@@ -1,4 +1,4 @@
-name: Sync Notion to GitHub
+name: Sync Notion to Cloudflare Pages
 
 on:
   schedule:
@@ -28,24 +28,18 @@ jobs:
         run: |
           python sync_notion.py
 
-      - name: Check for changes
-        id: check_changes
+      - name: Check if index.html exists
         run: |
-          if [[ -n $(git status -s) ]]; then
-            echo "changes_exist=true" >> $GITHUB_OUTPUT
-          else
-            echo "changes_exist=false" >> $GITHUB_OUTPUT
+          if [ ! -f "index.html" ]; then
+            echo "index.html not found!"
+            exit 1
           fi
 
-      - name: Commit and push changes
-        if: steps.check_changes.outputs.changes_exist == 'true'
+      - name: Deploy to Cloudflare Pages
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
-          git config --global user.email "action@github.com"
-          git config --global user.name "GitHub Action"
-          git add .
-          git commit -m "Auto-sync from Notion"
-          git push
-
-      - name: No changes
-        if: steps.check_changes.outputs.changes_exist == 'false'
-        run: echo "No changes to commit"
+          curl -X POST "https://api.cloudflare.com/client/v4/accounts/${{ secrets.CLOUDFLARE_ACCOUNT_ID }}/pages/projects/CLOUDFLARE_PROJECT/deployments" \
+          -H "Authorization: Bearer ${{ secrets.CLOUDFLARE_API_TOKEN }}" \
+          -F "file=@./index.html"
