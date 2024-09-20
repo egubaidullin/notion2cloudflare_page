@@ -9,7 +9,8 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -21,23 +22,25 @@ jobs:
           python -m pip install --upgrade pip
           pip install requests beautifulsoup4
 
-      - name: Sync Notion to HTML
-        run: |
-          python sync_notion.py
-
-      - name: Check if index.html exists
-        run: |
-          if [ ! -f "index.html" ]; then
-            echo "index.html not found!"
-            exit 1
-          fi
-
-      - name: Deploy to Cloudflare Pages
+      - name: Sync Notion to Cloudflare Pages
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           CLOUDFLARE_PROJECT: ${{ secrets.CLOUDFLARE_PROJECT }}
         run: |
-          curl -X POST "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/$CLOUDFLARE_PROJECT/deployments" \
-          -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
-          -F "file=@./index.html"
+          python sync_notion.py
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: cloudflare-deployment-logs
+          path: cloudflare-deployment.log
+        if: always()
+
+      - name: Notify on failure
+        if: failure()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          text: Sync to Cloudflare Pages failed!
+          webhook_url: ${{ secrets.SLACK_WEBHOOK }}  # Убедитесь, что у вас есть этот секрет, если вы хотите использовать Slack для уведомлений
