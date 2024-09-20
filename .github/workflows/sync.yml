@@ -28,9 +28,24 @@ jobs:
       run: |
         python sync_notion.py
 
+    - name: Check for changes
+      id: check_changes
+      run: |
+        if [[ -n $(git status -s) ]]; then
+          echo "changes_exist=true" >> $GITHUB_OUTPUT
+        else
+          echo "changes_exist=false" >> $GITHUB_OUTPUT
+        fi
+
     - name: Commit and push changes
+      if: steps.check_changes.outputs.changes_exist == 'true'
       run: |
         git config --global user.email "action@github.com"
         git config --global user.name "GitHub Action"
-        git add *.html
-        git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-sync from Notion" && git push)
+        git add .
+        git commit -m "Auto-sync from Notion"
+        git push
+
+    - name: No changes
+      if: steps.check_changes.outputs.changes_exist == 'false'
+      run: echo "No changes to commit"
