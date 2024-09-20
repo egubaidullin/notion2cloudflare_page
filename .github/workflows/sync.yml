@@ -30,17 +30,10 @@ jobs:
         run: |
           python sync_notion.py
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: cloudflare-deployment-logs
-          path: cloudflare-deployment.log
-        if: always()
-
-      - name: Notify on failure
+      - name: Notify on failure (Slack notification, optional)
         if: failure()
         uses: 8398a7/action-slack@v3
         with:
           status: ${{ job.status }}
           text: Sync to Cloudflare Pages failed!
-          webhook_url: ${{ secrets.SLACK_WEBHOOK }}  # Убедитесь, что у вас есть этот секрет, если вы хотите использовать Slack для уведомлений
+          webhook_url: ${{ secrets.SLACK_WEBHOOK }}  # Убедитесь, что у вас есть этот секрет, если хотите уведомления в Slack
