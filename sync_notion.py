@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 
 # Настройка логирования
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # Загрузка переменных окружения из .env файла
 load_dotenv()
@@ -15,9 +15,12 @@ load_dotenv()
 NOTION_API_TOKEN = os.getenv('NOTION_API_TOKEN')
 NOTION_DATABASE_ID = os.getenv('NOTION_DATABASE_ID')
 
+logging.debug(f"Initial NOTION_DATABASE_ID: {NOTION_DATABASE_ID}")
+
 # Удаление дефисов из ID базы данных
 if NOTION_DATABASE_ID:
     NOTION_DATABASE_ID = NOTION_DATABASE_ID.replace('-', '')
+    logging.debug(f"NOTION_DATABASE_ID after removing hyphens: {NOTION_DATABASE_ID}")
 
 # Проверка, что переменные окружения загружены
 if not NOTION_API_TOKEN or not NOTION_DATABASE_ID:
@@ -31,7 +34,9 @@ def get_notion_page():
     try:
         logging.info(f"Attempting to query database with ID: {NOTION_DATABASE_ID}")
         # Получение одной страницы из базы данных
-        pages = notion.databases.query(database_id=NOTION_DATABASE_ID).get('results')
+        response = notion.databases.query(database_id=NOTION_DATABASE_ID)
+        logging.debug(f"API Response: {response}")
+        pages = response.get('results')
         if not pages:
             raise ValueError("No pages found in the database.")
         logging.info(f"Successfully retrieved {len(pages)} pages from the database")
@@ -39,6 +44,7 @@ def get_notion_page():
         return pages[0]  # Возвращаем первую страницу
     except APIResponseError as e:
         logging.error(f"Error querying Notion database: {e}")
+        logging.error(f"Error details: {e.code} - {e.body}")
         raise
     except Exception as e:
         logging.error(f"Unexpected error: {e}")
