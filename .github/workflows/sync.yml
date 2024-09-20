@@ -9,10 +9,10 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3  # Обновлено с v2 до v3
+    - uses: actions/checkout@v4  # Обновлено до последней версии
 
     - name: Set up Python
-      uses: actions/setup-python@v4  # Обновлено с v2 до v4
+      uses: actions/setup-python@v5  # Обновлено до последней версии
       with:
         python-version: '3.x'
 
