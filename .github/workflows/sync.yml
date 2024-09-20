@@ -1,4 +1,4 @@
-name: Sync Notion to Cloudflare Pages
+name: Sync Notion to GitHub
 
 on:
   schedule:
@@ -9,10 +9,10 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4  # Обновлено до последней версии
+    - uses: actions/checkout@v4
 
     - name: Set up Python
-      uses: actions/setup-python@v5  # Обновлено до последней версии
+      uses: actions/setup-python@v5
       with:
         python-version: '3.x'
 
@@ -21,16 +21,16 @@ jobs:
         python -m pip install --upgrade pip
         pip install requests python-dotenv notion-client beautifulsoup4
 
-    - name: Sync Notion to Cloudflare Pages
+    - name: Sync Notion to HTML
       env:
         NOTION_API_TOKEN: ${{ secrets.NOTION_API_TOKEN }}
         NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
       run: |
         python sync_notion.py
 
-    - name: Commit and push if changed
+    - name: Commit and push changes
       run: |
         git config --global user.email "action@github.com"
         git config --global user.name "GitHub Action"
-        git add -A
+        git add *.html
         git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-sync from Notion" && git push)
