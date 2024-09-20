@@ -2,7 +2,6 @@ import requests
 from bs4 import BeautifulSoup
 import logging
 import os
-import json
 
 # Настройка логирования
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
