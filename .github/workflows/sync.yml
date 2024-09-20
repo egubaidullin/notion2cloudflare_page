@@ -23,15 +23,15 @@ jobs:
 
       - name: Debug Environment Variables
         run: |
-          echo "NOTION_DATABASE_ID length: ${#NOTION_DATABASE_ID}"
-          echo "NOTION_DATABASE_ID first 5 chars: ${NOTION_DATABASE_ID:0:5}"
+          echo "NOTION_RESOURCE_ID length: ${#NOTION_RESOURCE_ID}"
+          echo "NOTION_RESOURCE_ID first 5 chars: ${NOTION_RESOURCE_ID:0:5}"
         env:
-          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+          NOTION_RESOURCE_ID: ${{ secrets.NOTION_RESOURCE_ID }}
 
       - name: Sync Notion to HTML
         env:
           NOTION_API_TOKEN: ${{ secrets.NOTION_API_TOKEN }}
-          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+          NOTION_RESOURCE_ID: ${{ secrets.NOTION_RESOURCE_ID }}
         run: |
           python sync_notion.py
 
