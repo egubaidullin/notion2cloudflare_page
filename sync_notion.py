@@ -16,16 +16,16 @@ NOTION_DATABASE_ID = os.getenv('NOTION_DATABASE_ID')
 
 notion = Client(auth=NOTION_API_TOKEN)
 
-def get_notion_pages():
+def get_notion_page():
     try:
-        logging.info(f"Attempting to query database with ID: {NOTION_DATABASE_ID}")
-        pages = notion.databases.query(database_id=NOTION_DATABASE_ID).get('results')
-        logging.info(f"Successfully retrieved {len(pages)} pages from the database")
-        return pages
+        logging.info(f"Attempting to retrieve the page with ID: {NOTION_DATABASE_ID}")
+        page = notion.pages.retrieve(page_id=NOTION_DATABASE_ID)
+        logging.info("Successfully retrieved the page")
+        return page
     except APIResponseError as e:
-        logging.error(f"Error querying Notion database: {e}")
+        logging.error(f"Error retrieving the Notion page: {e}")
         if e.code == "object_not_found":
-            logging.error("The database ID may be incorrect or the integration may not have access to it.")
+            logging.error("The page ID may be incorrect or the integration may not have access to it.")
         raise
 
 def convert_to_html(page):
@@ -36,11 +36,13 @@ def convert_to_html(page):
         soup = BeautifulSoup('<html><head></head><body></body></html>', 'html.parser')
         body = soup.body
 
+        # Извлекаем заголовок страницы
         title = page['properties'].get('Name', {}).get('title', [{}])[0].get('plain_text', 'Untitled')
         h1 = soup.new_tag('h1')
         h1.string = title
         body.append(h1)
 
+        # Преобразуем блоки страницы в HTML
         for block in blocks:
             if block['type'] == 'paragraph':
                 p = soup.new_tag('p')
@@ -67,12 +69,15 @@ def save_html(html, filename):
 
 def main():
     try:
-        pages = get_notion_pages()
-        for page in pages:
-            html = convert_to_html(page)
-            title = page['properties'].get('Name', {}).get('title', [{}])[0].get('plain_text', 'Untitled')
-            filename = f"{title.lower().replace(' ', '-')}.html"
-            save_html(html, filename)
+        # Получаем страницу по ID
+        page = get_notion_page()
+
+        # Преобразуем страницу в HTML
+        html = convert_to_html(page)
+
+        # Сохраняем как index.html
+        save_html(html, 'index.html')
+
         logging.info("Sync completed successfully")
     except Exception as e:
         logging.error(f"Sync failed: {e}")
