@@ -13,37 +13,44 @@ load_dotenv()
 
 # Получение токенов из переменных окружения
 NOTION_API_TOKEN = os.getenv('NOTION_API_TOKEN')
-NOTION_DATABASE_ID = os.getenv('NOTION_DATABASE_ID')
+NOTION_RESOURCE_ID = os.getenv('NOTION_RESOURCE_ID')  # Переименовано для большей гибкости
 
-logging.debug(f"Initial NOTION_DATABASE_ID: {NOTION_DATABASE_ID}")
+logging.debug(f"Initial NOTION_RESOURCE_ID: {NOTION_RESOURCE_ID}")
 
-# Удаление дефисов из ID базы данных
-if NOTION_DATABASE_ID:
-    NOTION_DATABASE_ID = NOTION_DATABASE_ID.replace('-', '')
-    logging.debug(f"NOTION_DATABASE_ID after removing hyphens: {NOTION_DATABASE_ID}")
+# Удаление дефисов из ID ресурса
+if NOTION_RESOURCE_ID:
+    NOTION_RESOURCE_ID_NO_HYPHENS = NOTION_RESOURCE_ID.replace('-', '')
+    logging.debug(f"NOTION_RESOURCE_ID after removing hyphens: {NOTION_RESOURCE_ID_NO_HYPHENS}")
 
 # Проверка, что переменные окружения загружены
-if not NOTION_API_TOKEN or not NOTION_DATABASE_ID:
-    logging.error("Missing NOTION_API_TOKEN or NOTION_DATABASE_ID. Please check your environment variables.")
+if not NOTION_API_TOKEN or not NOTION_RESOURCE_ID:
+    logging.error("Missing NOTION_API_TOKEN or NOTION_RESOURCE_ID. Please check your environment variables.")
     exit(1)
 
 # Инициализация клиента Notion
 notion = Client(auth=NOTION_API_TOKEN)
 
-def get_notion_page():
+def get_notion_content():
     try:
-        logging.info(f"Attempting to query database with ID: {NOTION_DATABASE_ID}")
-        # Получение одной страницы из базы данных
-        response = notion.databases.query(database_id=NOTION_DATABASE_ID)
-        logging.debug(f"API Response: {response}")
-        pages = response.get('results')
-        if not pages:
-            raise ValueError("No pages found in the database.")
-        logging.info(f"Successfully retrieved {len(pages)} pages from the database")
-        logging.info(f"Page ID: {pages[0]['id']}")
-        return pages[0]  # Возвращаем первую страницу
+        logging.info(f"Attempting to query Notion resource with ID: {NOTION_RESOURCE_ID}")
+        
+        # Пробуем сначала как базу данных
+        try:
+            response = notion.databases.query(database_id=NOTION_RESOURCE_ID_NO_HYPHENS)
+            logging.debug("Successfully queried as database")
+            return response.get('results')[0] if response.get('results') else None
+        except APIResponseError as e:
+            if e.code == "object_not_found":
+                logging.debug("Not a database, trying as a page")
+                # Если не база данных, пробуем как страницу
+                response = notion.pages.retrieve(page_id=NOTION_RESOURCE_ID)
+                logging.debug("Successfully retrieved as page")
+                return response
+            else:
+                raise
+
     except APIResponseError as e:
-        logging.error(f"Error querying Notion database: {e}")
+        logging.error(f"Error querying Notion resource: {e}")
         logging.error(f"Error details: {e.code} - {e.body}")
         raise
     except Exception as e:
