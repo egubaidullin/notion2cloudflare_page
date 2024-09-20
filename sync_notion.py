@@ -28,12 +28,14 @@ def get_notion_content():
 def parse_notion_content(html_content):
     soup = BeautifulSoup(html_content, 'html.parser')
     title = soup.find('title').text if soup.find('title') else 'Untitled'
-    main_content = soup.find('div', class_='notion-page-content')
     
+    # Извлекаем весь контент
+    main_content = soup.body
+
     if not main_content:
         logging.warning("Main content not found. The page structure might have changed.")
         return f"<h1>{title}</h1><p>Content could not be extracted.</p>"
-    
+
     return f"<h1>{title}</h1>{main_content}"
 
 def create_manifest(html_content):
@@ -55,19 +57,31 @@ def publish_to_cloudflare(html_content):
     
     headers = {
         "Authorization": f"Bearer {CLOUDFLARE_API_TOKEN}",
-        "Content-Type": "multipart/form-data",
+        "Content-Type": "application/json"
     }
 
-    # Создаем манифест
-    manifest = create_manifest(html_content)
+    # Создаем манифест с SHA256 хешем для index.html
+    file_hash = hashlib.sha256(html_content.encode('utf-8')).hexdigest()
     
-    files = {
-        'index.html': ('index.html', html_content, 'text/html'),
-        'manifest': (None, json.dumps(manifest), 'application/json')
+    manifest = {
+        "files": {
+            "/index.html": {
+                "path": "index.html",
+                "hash": file_hash
+            }
+        }
+    }
+    
+    # Пакуем всё в JSON
+    data = {
+        "manifest": manifest,
+        "files": {
+            "index.html": html_content
+        }
     }
 
     try:
-        response = requests.post(url, headers=headers, files=files)
+        response = requests.post(url, headers=headers, json=data)
         response.raise_for_status()
         deployment = response.json()
         logging.info(f"Deployment successful. URL: {deployment['result']['url']}")
