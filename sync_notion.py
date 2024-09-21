@@ -1,3 +1,4 @@
+from jinja2 import Environment, FileSystemLoader
 import os
 import requests
 import logging
@@ -5,6 +6,10 @@ import json
 from html import escape
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+# Настраиваем путь к шаблонам
+env = Environment(loader=FileSystemLoader('.'))
+template = env.get_template('template.html')
 
 NOTION_API_TOKEN = os.getenv('NOTION_API_TOKEN')
 NOTION_PAGE_ID = os.getenv('NOTION_PAGE_ID')
@@ -118,106 +123,15 @@ def get_child_blocks(block_id):
 def get_text_content(rich_text):
     return ''.join([t['plain_text'] for t in rich_text])
 
-def save_html(html_content, toc, title, filename='index.html'):
+def save_html(toc, html_content, title, filename='index.html'):
     try:
-        full_html = f"""
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>{title}</title>
-            <style>
-                body {{
-                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-                    line-height: 1.6;
-                    color: #37352f;
-                    margin: 0;
-                    padding: 20px;
-                }}
-                .content {{
-                    max-width: 900px;
-                    margin: 0 auto;
-                }}
-                h1, h2, h3 {{
-                    margin-top: 24px;
-                    margin-bottom: 16px;
-                }}
-                pre {{
-                    background-color: #f6f6f6;
-                    padding: 16px;
-                    border-radius: 4px;
-                    overflow-x: auto;
-                }}
-                code {{
-                    font-family: SFMono-Regular, Consolas, 'Liberation Mono', Menlo, Courier, monospace;
-                }}
-                .callout {{
-                    background-color: #f1f1f1;
-                    padding: 16px;
-                    border-radius: 4px;
-                    margin-bottom: 16px;
-                }}
-                img {{
-                    max-width: 100%;
-                    height: auto;
-                }}
-                .toc {{
-                    background: #f9f9f9;
-                    padding: 10px;
-                    border-radius: 8px;
-                    margin-bottom: 20px;
-                }}
-                .toc ul {{
-                    list-style: none;
-                    padding-left: 0;
-                }}
-                .toc li {{
-                    margin-bottom: 8px;
-                }}
-                #back-to-top {{
-                    position: fixed;
-                    bottom: 20px;
-                    right: 20px;
-                    background-color: #007bff;
-                    color: white;
-                    padding: 10px;
-                    border-radius: 50%;
-                    cursor: pointer;
-                    display: none;
-                }}
-            </style>
-            <script>
-                document.addEventListener("DOMContentLoaded", function() {{
-                    const backToTopBtn = document.getElementById("back-to-top");
-                    window.addEventListener("scroll", function() {{
-                        if (window.pageYOffset > 100) {{
-                            backToTopBtn.style.display = "block";
-                        }} else {{
-                            backToTopBtn.style.display = "none";
-                        }}
-                    }});
+        # Используем шаблон для рендеринга
+        full_html = template.render(
+            title=title,
+            toc=toc,
+            content=''.join(html_content)
+        )
 
-                    backToTopBtn.addEventListener("click", function() {{
-                        window.scrollTo({{top: 0, behavior: "smooth"}});
-                    }});
-                }});
-            </script>
-        </head>
-        <body>
-            <div class="content">
-                <div class="toc">
-                    <h2>Table of Contents</h2>
-                    <ul>
-                        {''.join(toc)}
-                    </ul>
-                </div>
-                {''.join(html_content)}
-            </div>
-            <div id="back-to-top">↑</div>
-        </body>
-        </html>
-        """
         with open(filename, 'w', encoding='utf-8') as f:
             f.write(full_html)
         logging.info(f"HTML content saved to {filename}")
@@ -225,6 +139,18 @@ def save_html(html_content, toc, title, filename='index.html'):
         logging.error(f"Error saving HTML content: {e}")
         raise
 
+def main():
+    try:
+        logging.info("Starting Notion page sync...")
+        notion_content = get_notion_content()
+        toc, html_content = convert_to_html(notion_content)
+        title = get_notion_title()  # Функция, возвращающая заголовок страницы из Notion
+        save_html(toc, html_content, title)
+        logging.info("Sync completed successfully")
+    except Exception as e:
+        logging.error(f"Sync failed: {e}")
+        raise
+        
 def main():
     try:
         logging.info("Starting Notion page sync...")
