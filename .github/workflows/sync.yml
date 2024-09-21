@@ -1,4 +1,4 @@
-name: Deploy Notion Page to Cloudflare Pages
+name: Sync Notion Page to Cloudflare Pages
 
 on:
   schedule:
@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  deploy:
+  sync:
     runs-on: ubuntu-latest
 
     steps:
@@ -30,11 +30,3 @@ jobs:
           CLOUDFLARE_PROJECT: ${{ secrets.CLOUDFLARE_PROJECT }}
         run: |
           python sync_notion.py
-
-      - name: Deploy to Cloudflare Pages
-        uses: cloudflare/pages-action@1
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          projectName: ${{ secrets.CLOUDFLARE_PROJECT }}
-          directory: './'
