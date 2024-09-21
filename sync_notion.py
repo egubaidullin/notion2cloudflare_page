@@ -155,6 +155,11 @@ def save_html(toc, html_content, title, filename='index.html'):
         logging.error(f"Error saving HTML content: {e}")
         raise
 
+def get_title(blocks):
+    for block in blocks:
+        if block['type'] == 'heading_1':
+            return get_text_content(block['heading_1']['rich_text'])
+    return "Tips and scripts"  # Fallback if no heading found
 
 def main():
     try:
