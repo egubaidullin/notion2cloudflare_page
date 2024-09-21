@@ -124,12 +124,30 @@ def get_text_content(rich_text):
 
 def save_html(toc, html_content, title, filename='index.html'):
     try:
-        full_html = template.render(
-            title=title,
-            toc=''.join(toc),
-            content=''.join(html_content)
-        )
-
+        full_html = f"""
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>{title}</title>  <!-- Use the title parameter here -->
+            <style>
+                /* Styles here */
+            </style>
+        </head>
+        <body>
+            <div class="toc">
+                <h3>Table of Contents</h3>
+                <ul>
+                    {toc}  <!-- Insert TOC here -->
+                </ul>
+            </div>
+            <div class="content">
+                {html_content}  <!-- Insert main content here -->
+            </div>
+        </body>
+        </html>
+        """
         with open(filename, 'w', encoding='utf-8') as f:
             f.write(full_html)
         logging.info(f"HTML content saved to {filename}")
@@ -137,17 +155,20 @@ def save_html(toc, html_content, title, filename='index.html'):
         logging.error(f"Error saving HTML content: {e}")
         raise
 
+
 def main():
     try:
         logging.info("Starting Notion page sync...")
         notion_content = get_notion_content()
-        title = "Tips and scripts"  # You can extract this from Notion if needed
-        toc, html_content = convert_to_html(notion_content)
-        save_html(toc, html_content, title)
+        title = get_title(notion_content)  # Extract title from Notion
+        toc = generate_toc(notion_content)  # Generate TOC from Notion content
+        html_content = convert_to_html(notion_content)  # Convert blocks to HTML
+        save_html(toc, html_content, title)  # Call save_html with TOC, content, and title
         logging.info("Sync completed successfully")
     except Exception as e:
         logging.error(f"Sync failed: {e}")
         raise
+
 
 if __name__ == "__main__":
     main()
