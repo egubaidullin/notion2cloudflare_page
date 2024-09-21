@@ -2,7 +2,7 @@ import os
 import requests
 import logging
 import json
-import markdown2
+from html import escape
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -17,48 +17,90 @@ headers = {
 }
 
 def get_notion_content():
-    try:
-        response = requests.get(NOTION_API_URL, headers=headers)
-        response.raise_for_status()
-        logging.info("Fetched Notion page content successfully.")
-        return response.json()
-    except requests.RequestException as e:
-        logging.error(f"Error fetching Notion page content: {e}")
-        raise
+    all_blocks = []
+    has_more = True
+    start_cursor = None
 
-def convert_to_html(blocks):
+    while has_more:
+        try:
+            params = {"page_size": 100}
+            if start_cursor:
+                params["start_cursor"] = start_cursor
+
+            response = requests.get(NOTION_API_URL, headers=headers, params=params)
+            response.raise_for_status()
+            data = response.json()
+
+            all_blocks.extend(data['results'])
+            has_more = data['has_more']
+            start_cursor = data.get('next_cursor')
+
+            logging.info(f"Fetched {len(data['results'])} blocks. Total blocks: {len(all_blocks)}")
+
+        except requests.RequestException as e:
+            logging.error(f"Error fetching Notion page content: {e}")
+            raise
+
+    return all_blocks
+
+def convert_to_html(blocks, level=0):
     html_content = []
-    for block in blocks['results']:
-        if block['type'] == 'paragraph':
-            text = block['paragraph']['rich_text']
-            if text:
-                html_content.append(f"<p>{text[0]['plain_text']}</p>")
-        elif block['type'] == 'heading_1':
-            text = block['heading_1']['rich_text']
-            if text:
-                html_content.append(f"<h1>{text[0]['plain_text']}</h1>")
-        elif block['type'] == 'heading_2':
-            text = block['heading_2']['rich_text']
-            if text:
-                html_content.append(f"<h2>{text[0]['plain_text']}</h2>")
-        elif block['type'] == 'heading_3':
-            text = block['heading_3']['rich_text']
-            if text:
-                html_content.append(f"<h3>{text[0]['plain_text']}</h3>")
-        elif block['type'] == 'bulleted_list_item':
-            text = block['bulleted_list_item']['rich_text']
-            if text:
-                html_content.append(f"<li>{text[0]['plain_text']}</li>")
-        elif block['type'] == 'numbered_list_item':
-            text = block['numbered_list_item']['rich_text']
-            if text:
-                html_content.append(f"<li>{text[0]['plain_text']}</li>")
-        elif block['type'] == 'code':
-            code = block['code']['rich_text'][0]['plain_text']
+    list_type = None
+
+    for block in blocks:
+        block_type = block['type']
+        if block_type == 'paragraph':
+            html_content.append(f"<p>{get_text_content(block['paragraph']['rich_text'])}</p>")
+        elif block_type.startswith('heading_'):
+            level = int(block_type[-1])
+            html_content.append(f"<h{level}>{get_text_content(block[block_type]['rich_text'])}</h{level}>")
+        elif block_type == 'bulleted_list_item':
+            if list_type != 'ul':
+                if list_type:
+                    html_content.append(f"</{'ol' if list_type == 'ol' else 'ul'}>")
+                html_content.append("<ul>")
+                list_type = 'ul'
+            html_content.append(f"<li>{get_text_content(block['bulleted_list_item']['rich_text'])}</li>")
+        elif block_type == 'numbered_list_item':
+            if list_type != 'ol':
+                if list_type:
+                    html_content.append(f"</{'ol' if list_type == 'ol' else 'ul'}>")
+                html_content.append("<ol>")
+                list_type = 'ol'
+            html_content.append(f"<li>{get_text_content(block['numbered_list_item']['rich_text'])}</li>")
+        elif block_type == 'code':
+            code = escape(get_text_content(block['code']['rich_text']))
             language = block['code']['language']
             html_content.append(f"<pre><code class='{language}'>{code}</code></pre>")
-    
-    return "\n".join(html_content)
+        elif block_type == 'image':
+            image_url = block['image']['file']['url']
+            html_content.append(f"<img src='{image_url}' alt='Notion image'>")
+        elif block_type == 'divider':
+            html_content.append("<hr>")
+        elif block_type == 'quote':
+            html_content.append(f"<blockquote>{get_text_content(block['quote']['rich_text'])}</blockquote>")
+        elif block_type == 'callout':
+            emoji = block['callout']['icon']['emoji'] if block['callout']['icon']['type'] == 'emoji' else ''
+            text = get_text_content(block['callout']['rich_text'])
+            html_content.append(f"<div class='callout'>{emoji} {text}</div>")
+        
+        if 'has_children' in block and block['has_children']:
+            child_blocks = get_child_blocks(block['id'])
+            html_content.extend(convert_to_html(child_blocks, level + 1))
+
+    if list_type:
+        html_content.append(f"</{'ol' if list_type == 'ol' else 'ul'}>")
+
+    return html_content
+
+def get_child_blocks(block_id):
+    url = f"https://api.notion.com/v1/blocks/{block_id}/children"
+    response = requests.get(url, headers=headers)
+    response.raise_for_status()
+    return response.json()['results']
+
+def get_text_content(rich_text):
+    return ''.join([t['plain_text'] for t in rich_text])
 
 def save_html(html_content, filename='index.html'):
     try:
@@ -94,11 +136,21 @@ def save_html(html_content, filename='index.html'):
                 code {{
                     font-family: SFMono-Regular, Consolas, 'Liberation Mono', Menlo, Courier, monospace;
                 }}
+                .callout {{
+                    background-color: #f1f1f1;
+                    padding: 16px;
+                    border-radius: 4px;
+                    margin-bottom: 16px;
+                }}
+                img {{
+                    max-width: 100%;
+                    height: auto;
+                }}
             </style>
         </head>
         <body>
             <div class="content">
-                {html_content}
+                {''.join(html_content)}
             </div>
         </body>
         </html>
@@ -119,6 +171,7 @@ def main():
         logging.info("Sync completed successfully")
     except Exception as e:
         logging.error(f"Sync failed: {e}")
+        raise
 
 if __name__ == "__main__":
     main()
