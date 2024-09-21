@@ -96,10 +96,13 @@ def convert_to_html(blocks):
             emoji = block['callout']['icon']['emoji'] if block['callout']['icon']['type'] == 'emoji' else ''
             text = get_text_content(block['callout']['rich_text'])
             html_content.append(f"<div class='callout'>{emoji} {text}</div>")
-        
+
+        # Проверяем, есть ли дочерние блоки
         if 'has_children' in block and block['has_children']:
             child_blocks = get_child_blocks(block['id'])
-            html_content.extend(convert_to_html(child_blocks))
+            # Рекурсивно конвертируем дочерние блоки и объединяем в строку
+            child_html_content = ''.join(convert_to_html(child_blocks)[1])  # Возвращаем только HTML, игнорируем TOC
+            html_content.append(child_html_content)  # Добавляем дочерние блоки как строку
 
     if list_type:
         html_content.append(f"</{'ol' if list_type == 'ol' else 'ul'}>")
