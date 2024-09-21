@@ -12,7 +12,10 @@ CLOUDFLARE_PROJECT = os.getenv('CLOUDFLARE_PROJECT')
 
 def get_notion_content():
     try:
-        response = requests.get(NOTION_PAGE_URL)
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        }
+        response = requests.get(NOTION_PAGE_URL, headers=headers)
         response.raise_for_status()
         logging.info("Fetched Notion page successfully.")
         return response.text
@@ -23,12 +26,19 @@ def get_notion_content():
 def process_html(html_content):
     soup = BeautifulSoup(html_content, 'html.parser')
     
-    # Extract the main content
+    # Try to find the main content
     main_content = soup.find('div', class_='notion-page-content')
     
     if not main_content:
-        logging.error("Could not find main content")
-        return None
+        # If we can't find the specific class, let's try to get all the content
+        main_content = soup.find('body')
+        if not main_content:
+            logging.error("Could not find any content")
+            return None
+    
+    # Remove script tags
+    for script in main_content(["script", "style"]):
+        script.decompose()
     
     # Create a new HTML structure
     new_html = f"""
@@ -74,13 +84,12 @@ def process_html(html_content):
     """
     
     return new_html
-    
+
 def deploy_to_cloudflare(html_content):
     url = f"https://api.cloudflare.com/client/v4/accounts/{CLOUDFLARE_ACCOUNT_ID}/pages/projects/{CLOUDFLARE_PROJECT}/deployments"
     
     headers = {
         "Authorization": f"Bearer {CLOUDFLARE_API_TOKEN}",
-        "Content-Type": "application/json"
     }
 
     files = {
