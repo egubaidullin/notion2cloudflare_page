@@ -90,14 +90,33 @@ def deploy_to_cloudflare(html_content):
     
     headers = {
         "Authorization": f"Bearer {CLOUDFLARE_API_TOKEN}",
+        "Content-Type": "application/json"
+    }
+
+    # Создаем временный файл index.html
+    with open('index.html', 'w', encoding='utf-8') as f:
+        f.write(html_content)
+
+    # Создаем манифест файлов
+    manifest = {
+        "index.html": {
+            "etag": "etag",  # Можно оставить как есть или использовать хеш файла
+            "size": os.path.getsize('index.html')
+        }
+    }
+
+    # Формируем данные для отправки
+    data = {
+        "manifest": json.dumps(manifest),
+        "branch": "main"  # или используйте нужную вам ветку
     }
 
     files = {
-        'index.html': ('index.html', html_content, 'text/html')
+        'index.html': ('index.html', open('index.html', 'rb'), 'text/html')
     }
 
     try:
-        response = requests.post(url, headers=headers, files=files)
+        response = requests.post(url, headers=headers, data=data, files=files)
         response.raise_for_status()
         deployment = response.json()
         logging.info(f"Deployment successful. URL: {deployment['result']['url']}")
@@ -106,6 +125,9 @@ def deploy_to_cloudflare(html_content):
         if hasattr(e, 'response') and e.response is not None:
             logging.error(f"Response content: {e.response.content}")
         raise
+    finally:
+        # Удаляем временный файл
+        os.remove('index.html')
 
 def main():
     try:
