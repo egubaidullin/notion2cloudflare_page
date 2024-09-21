@@ -141,7 +141,7 @@ def main():
     try:
         logging.info("Starting Notion page sync...")
         notion_content = get_notion_content()
-        title = "Your Page Title from Notion"  # You can extract this from Notion if needed
+        title = "Tips and scripts"  # You can extract this from Notion if needed
         toc, html_content = convert_to_html(notion_content)
         save_html(toc, html_content, title)
         logging.info("Sync completed successfully")
