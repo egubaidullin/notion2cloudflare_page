@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        .toc {
+            margin-bottom: 20px;
+        }
+        .toc ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        .toc li {
+            margin-bottom: 5px;
+        }
+        .content {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        #scrollToTop {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: none;
+            padding: 10px;
+            background-color: #333;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="content">
+        <h1>{{ title }}</h1>
+        
+        <!-- Оглавление -->
+        <div class="toc">
+            <h2>Table of Contents</h2>
+            <ul>
+                {{ toc|safe }}
+            </ul>
+        </div>
+
+        <!-- Основной контент -->
+        {{ content|safe }}
+
+    </div>
+
+    <div id="scrollToTop" onclick="window.scrollTo({ top: 0, behavior: 'smooth' });">
+        ↑ Back to top
+    </div>
+
+    <script>
+        window.onscroll = function() {
+            const btn = document.getElementById('scrollToTop');
+            if (document.documentElement.scrollTop > 200) {
+                btn.style.display = 'block';
+            } else {
+                btn.style.display = 'none';
+            }
+        };
+    </script>
+</body>
+</html>
