@@ -105,10 +105,16 @@ def get_child_blocks(block_id):
 def get_text_content(rich_text):
     return ''.join([t['plain_text'] for t in rich_text])
 
-def get_title(blocks):
-    for block in blocks:
-        if block['type'] == 'heading_1':
-            return get_text_content(block['heading_1']['rich_text'])
+def get_title(page_id):
+    url = f"https://api.notion.com/v1/pages/{page_id}"
+    response = requests.get(url, headers=headers)
+    response.raise_for_status()
+    page_data = response.json()
+    
+    # Получаем заголовок страницы из свойств
+    if 'properties' in page_data and 'Name' in page_data['properties']:
+        return page_data['properties']['Name']['title'][0]['text']['content']
+    
     return "Your Page Title from Notion"
 
 def generate_toc(blocks):
@@ -144,7 +150,7 @@ def main():
         logging.info("Starting Notion page sync...")
         notion_content = get_notion_content()
         html_content = convert_to_html(notion_content)
-        title = get_title(notion_content)  # Extract title from Notion
+        title = get_title(NOTION_PAGE_ID)  # Получаем заголовок страницы
         toc = generate_toc(notion_content)  # Generate TOC from Notion content
         save_html(toc, html_content, title)  # Call save_html with TOC, content, and title
         logging.info("Sync completed successfully")
