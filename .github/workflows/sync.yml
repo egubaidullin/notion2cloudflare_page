@@ -22,6 +22,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install requests markdown2
+          pip install requests markdown2 jinja2
 
       - name: Fetch Notion page content
         env:
