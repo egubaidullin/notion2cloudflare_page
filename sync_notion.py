@@ -6,7 +6,6 @@ from bs4 import BeautifulSoup
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 NOTION_PAGE_URL = "https://egub.notion.site/Tips-and-scripts-for-the-job-2939fb1d8d514e25af07d9596b52cdbe"
-
 CLOUDFLARE_ACCOUNT_ID = os.getenv('CLOUDFLARE_ACCOUNT_ID')
 CLOUDFLARE_API_TOKEN = os.getenv('CLOUDFLARE_API_TOKEN')
 CLOUDFLARE_PROJECT = os.getenv('CLOUDFLARE_PROJECT')
@@ -75,11 +74,29 @@ def process_html(html_content):
     """
     
     return new_html
+    
+def deploy_to_cloudflare(html_content):
+    url = f"https://api.cloudflare.com/client/v4/accounts/{CLOUDFLARE_ACCOUNT_ID}/pages/projects/{CLOUDFLARE_PROJECT}/deployments"
+    
+    headers = {
+        "Authorization": f"Bearer {CLOUDFLARE_API_TOKEN}",
+        "Content-Type": "application/json"
+    }
 
-def save_html_content(html_content):
-    with open('index.html', 'w', encoding='utf-8') as f:
-        f.write(html_content)
-    logging.info("Saved content to index.html")
+    files = {
+        'index.html': ('index.html', html_content, 'text/html')
+    }
+
+    try:
+        response = requests.post(url, headers=headers, files=files)
+        response.raise_for_status()
+        deployment = response.json()
+        logging.info(f"Deployment successful. URL: {deployment['result']['url']}")
+    except requests.RequestException as e:
+        logging.error(f"Error publishing to Cloudflare Pages: {e}")
+        if hasattr(e, 'response') and e.response is not None:
+            logging.error(f"Response content: {e.response.content}")
+        raise
 
 def main():
     try:
@@ -87,8 +104,8 @@ def main():
         html_content = get_notion_content()
         processed_html = process_html(html_content)
         if processed_html:
-            save_html_content(processed_html)
-            logging.info("Sync completed successfully")
+            deploy_to_cloudflare(processed_html)
+            logging.info("Sync and deploy completed successfully")
         else:
             logging.error("Failed to process HTML content")
     except Exception as e:
