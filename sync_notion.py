@@ -1,7 +1,6 @@
 import os
 import requests
 import logging
-import json
 from html import escape
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -43,7 +42,7 @@ def get_notion_content():
 
     return all_blocks
 
-def convert_to_html(blocks, level=0):
+def convert_to_html(blocks):
     html_content = []
     list_type = None
 
@@ -86,10 +85,12 @@ def convert_to_html(blocks, level=0):
             text = get_text_content(block['callout']['rich_text'])
             html_content.append(f"<div class='callout'>{emoji} {text}</div>")
         
+        # Process child blocks if present
         if 'has_children' in block and block['has_children']:
             child_blocks = get_child_blocks(block['id'])
-            html_content.extend(convert_to_html(child_blocks, level + 1))
+            html_content.extend(convert_to_html(child_blocks))
 
+    # Close any open list
     if list_type:
         html_content.append(f"</{'ol' if list_type == 'ol' else 'ul'}>")
 
@@ -122,69 +123,15 @@ def generate_toc(blocks):
 
 def save_html(toc, html_content, title, filename='index.html'):
     try:
-        full_html = f"""
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>{title}</title>
-            <style>
-                body {{
-                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-                    line-height: 1.6;
-                    color: #37352f;
-                    margin: 0;
-                    padding: 20px;
-                }}
-                .content {{
-                    max-width: 900px;
-                    margin: 0 auto;
-                }}
-                .toc {{
-                    position: fixed;
-                    top: 20px;
-                    right: 20px;
-                    background: #f9f9f9;
-                    padding: 10px;
-                    border: 1px solid #ddd;
-                    border-radius: 4px;
-                    z-index: 1000;
-                }}
-                h1, h2, h3 {{
-                    margin-top: 24px;
-                    margin-bottom: 16px;
-                }}
-                pre {{
-                    background-color: #f6f6f6;
-                    padding: 16px;
-                    border-radius: 4px;
-                    overflow-x: auto;
-                }}
-                code {{
-                    font-family: SFMono-Regular, Consolas, 'Liberation Mono', Menlo, Courier, monospace;
-                }}
-                .callout {{
-                    background-color: #f1f1f1;
-                    padding: 16px;
-                    border-radius: 4px;
-                    margin-bottom: 16px;
-                }}
-                img {{
-                    max-width: 100%;
-                    height: auto;
-                }}
-            </style>
-        </head>
-        <body>
-            <div class="content">
-                <h1>{title}</h1>
-                {toc}
-                {html_content}
-            </div>
-        </body>
-        </html>
-        """
+        # Load the HTML template
+        with open('template.html', 'r', encoding='utf-8') as f:
+            template = f.read()
+
+        # Replace placeholders with actual values
+        full_html = template.replace('{{ title }}', title) \
+                            .replace('{{ toc }}', toc) \
+                            .replace('{{ content }}', html_content)
+
         with open(filename, 'w', encoding='utf-8') as f:
             f.write(full_html)
         logging.info(f"HTML content saved to {filename}")
