@@ -2,8 +2,8 @@ name: Deploy Notion Page to Cloudflare Pages
 
 on:
   schedule:
-    - cron: '0 */6 * * *'  # Запуск каждые 6 часов
-  workflow_dispatch:  # Позволяет запускать вручную
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
 
 jobs:
   deploy:
@@ -23,7 +23,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install requests beautifulsoup4
 
-      - name: Fetch Notion page content
+      - name: Fetch Notion page content and deploy to Cloudflare
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_PROJECT: ${{ secrets.CLOUDFLARE_PROJECT }}
         run: |
           python sync_notion.py
 
@@ -33,9 +37,4 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           projectName: ${{ secrets.CLOUDFLARE_PROJECT }}
-          directory: './'  # Папка, где находится файл index.html
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          CLOUDFLARE_PROJECT: ${{ secrets.CLOUDFLARE_PROJECT }}
-
+          directory: './'
