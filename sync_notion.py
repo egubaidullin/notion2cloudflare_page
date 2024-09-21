@@ -161,6 +161,15 @@ def get_title(blocks):
             return get_text_content(block['heading_1']['rich_text'])
     return "Tips and scripts"  # Fallback if no heading found
 
+def generate_toc(blocks):
+    toc = []
+    for block in blocks:
+        if block['type'].startswith('heading_'):
+            level = int(block['type'][-1])  # Get heading level (h1, h2, etc.)
+            text = get_text_content(block[block['type']]['rich_text'])
+            toc.append(f"<li style='margin-left: {level * 20}px;'><a href='#{text}'>{text}</a></li>")
+    return ''.join(toc)
+
 def main():
     try:
         logging.info("Starting Notion page sync...")
