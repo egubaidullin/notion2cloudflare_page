@@ -12,6 +12,7 @@
             color: #37352f;
             margin: 0;
             padding: 20px;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         .content {
@@ -62,6 +63,12 @@
         .toc a {
             text-decoration: none; /* Remove underline from links */
             color: #333; /* Link color */
+            transition: color 0.3s ease; /* Плавный переход цвета */
+        }
+
+        /* Стили для hover-эффекта */
+        .toc a:hover {
+            color: #0056b3; /* Цвет ссылки при наведении */
         }
 
         .toc ul {
@@ -73,18 +80,135 @@
         .toc ul ul {
             margin-left: 20px; /* Indent nested items */
         }
+
+        /* CSS для кнопки "Наверх" */
+        #scrollToTopButton {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+            display: none; /* Скрываем кнопку по умолчанию */
+        }
+
+        #scrollToTopButton:hover {
+            opacity: 1;
+        }
+
+        /* CSS для кнопки переключения цвета */
+        #colorToggleButton {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+        }
+
+        #colorToggleButton:hover {
+            opacity: 1;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+
+        .dark-mode .toc {
+            background-color: #1e1e1e;
+        }
+
+        .dark-mode .toc a {
+            color: #e0e0e0;
+        }
+
+        .dark-mode .toc a:hover {
+            color: #bb86fc;
+        }
+
+        .dark-mode .content {
+            background-color: #1e1e1e;
+        }
+
+        .dark-mode pre {
+            background-color: #2e2e2e;
+        }
+
+        .dark-mode .callout {
+            background-color: #3e3e3e;
+        }
     </style>
 </head>
 <body>
+    <!-- HTML для кнопки "Наверх" -->
+    <button id="scrollToTopButton" title="Go to top">Top</button>
+
+    <!-- HTML для кнопки переключения цвета -->
+    <button id="colorToggleButton" title="Toggle dark mode">🌙</button>
+
     <div class="toc">
+        <h3>{{ title }}</h3>
         <h3>Table of Contents</h3>
         <ul>
             {{ toc }} <!-- TOC dynamically generated here -->
         </ul>
     </div>
-    
+
     <div class="content">
         {{ content }} <!-- Main content dynamically generated here -->
     </div>
+
+    <!-- JavaScript для кнопки "Наверх" -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const scrollToTopButton = document.getElementById('scrollToTopButton');
+
+            window.addEventListener('scroll', function() {
+                if (window.pageYOffset > 100) {
+                    scrollToTopButton.style.display = 'block';
+                } else {
+                    scrollToTopButton.style.display = 'none';
+                }
+            });
+
+            scrollToTopButton.addEventListener('click', function() {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+
+    <!-- JavaScript для кнопки переключения цвета -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const colorToggleButton = document.getElementById('colorToggleButton');
+
+            colorToggleButton.addEventListener('click', function() {
+                document.body.classList.toggle('dark-mode');
+            });
+        });
+    </script>
 </body>
 </html>
