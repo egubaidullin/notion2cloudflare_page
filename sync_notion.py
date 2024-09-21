@@ -102,6 +102,12 @@ def convert_to_html(blocks, level=0):
             text = get_text_content(block['callout']['rich_text'])
             html_content.append(f"<div class='callout'>{emoji} {text}</div>")
 
+        if block_type.startswith('heading_'):
+           level = int(block_type[-1])
+           text = get_text_content(block[block_type]['rich_text'])
+           heading_id = text.replace(" ", "-").lower()  # Create a slug for the heading
+           html_content.append(f"<h{level} id='{heading_id}'>{text}</h{level}>")
+
         if 'has_children' in block and block['has_children']:
             child_blocks = get_child_blocks(block['id'])
             child_toc, child_html = convert_to_html(child_blocks, level + 1)
@@ -130,20 +136,47 @@ def save_html(toc, html_content, title, filename='index.html'):
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>{title}</title>  <!-- Use the title parameter here -->
+            <title>{title}</title>
             <style>
-                /* Styles here */
+                body {{
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+                    line-height: 1.6;
+                    color: #37352f;
+                    margin: 0;
+                    padding: 20px;
+                }}
+                .toc {{
+                    position: fixed;
+                    top: 20px;
+                    left: 20px;
+                    width: 200px; /* Adjust as necessary */
+                    background: #f9f9f9;
+                    border: 1px solid #ccc;
+                    padding: 10px;
+                    z-index: 1000; /* Ensure TOC stays on top */
+                }}
+                .toc ul {{
+                    list-style-type: none;
+                    padding: 0;
+                }}
+                .toc li {{
+                    margin: 5px 0;
+                }}
+                .content {{
+                    max-width: 900px;
+                    margin: 0 auto; /* Center the main content */
+                }}
             </style>
         </head>
         <body>
             <div class="toc">
                 <h3>Table of Contents</h3>
                 <ul>
-                    {toc}  <!-- Insert TOC here -->
+                    {toc}
                 </ul>
             </div>
             <div class="content">
-                {html_content}  <!-- Insert main content here -->
+                {''.join(html_content)}
             </div>
         </body>
         </html>
@@ -154,6 +187,7 @@ def save_html(toc, html_content, title, filename='index.html'):
     except IOError as e:
         logging.error(f"Error saving HTML content: {e}")
         raise
+
 
 def get_title(blocks):
     for block in blocks:
@@ -167,7 +201,8 @@ def generate_toc(blocks):
         if block['type'].startswith('heading_'):
             level = int(block['type'][-1])  # Get heading level (h1, h2, etc.)
             text = get_text_content(block[block['type']]['rich_text'])
-            toc.append(f"<li style='margin-left: {level * 20}px;'><a href='#{text}'>{text}</a></li>")
+            heading_id = text.replace(" ", "-").lower()  # Create a slug for the heading
+            toc.append(f"<li style='margin-left: {level * 20}px;'><a href='#{heading_id}'>{text}</a></li>")
     return ''.join(toc)
 
 def main():
