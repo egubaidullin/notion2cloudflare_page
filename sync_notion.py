@@ -91,36 +91,40 @@ def deploy_to_cloudflare(html_content):
     
     headers = {
         "Authorization": f"Bearer {CLOUDFLARE_API_TOKEN}",
-        "Content-Type": "multipart/form-data"
+        "Content-Type": "application/json"
     }
 
-    # Создаем временный файл index.html
+    # Create temporary index.html file
     with open('index.html', 'w', encoding='utf-8') as f:
         f.write(html_content)
 
-    # Создаем манифест файлов
+    # Create manifest
     manifest = {
         "version": 1,
         "include": ["index.html"],
         "exclude": []
     }
 
-    # Формируем данные для отправки
-    files = {
-        'manifest': ('manifest.json', json.dumps(manifest), 'application/json'),
-        'index.html': ('index.html', open('index.html', 'rb'), 'text/html')
-    }
+    # Read file content
+    with open('index.html', 'rb') as file:
+        index_content = file.read()
 
-    data = {
-        "branch": "main"  # или используйте нужную вам ветку
+    # Prepare the request payload
+    payload = {
+        "manifest": manifest,
+        "files": {
+            "index.html": {
+                "content": index_content.decode('utf-8'),
+                "content_type": "text/html"
+            }
+        }
     }
 
     try:
         logging.info(f"Sending request to URL: {url}")
         logging.info(f"Headers: {headers}")
-        logging.info(f"Data: {data}")
-        logging.info(f"Files: {files.keys()}")
-        response = requests.post(url, headers=headers, data=data, files=files)
+        logging.info(f"Payload keys: {payload.keys()}")
+        response = requests.post(url, headers=headers, json=payload)
         response.raise_for_status()
         deployment = response.json()
         logging.info(f"Deployment successful. URL: {deployment['result']['url']}")
@@ -130,7 +134,7 @@ def deploy_to_cloudflare(html_content):
             logging.error(f"Response content: {e.response.content}")
         raise
     finally:
-        # Удаляем временный файл
+        # Remove temporary file
         os.remove('index.html')
 
 def main():
@@ -140,14 +144,17 @@ def main():
         logging.info(f"CLOUDFLARE_API_TOKEN: {'*' * len(CLOUDFLARE_API_TOKEN) if CLOUDFLARE_API_TOKEN else 'Not set'}")
         logging.info("Starting Notion page sync...")
         html_content = get_notion_content()
+        logging.info("Notion content fetched successfully.")
         processed_html = process_html(html_content)
         if processed_html:
+            logging.info("HTML content processed successfully.")
             deploy_to_cloudflare(processed_html)
             logging.info("Sync and deploy completed successfully")
         else:
             logging.error("Failed to process HTML content")
     except Exception as e:
         logging.error(f"Sync failed: {e}")
-
+        raise
+        
 if __name__ == "__main__":
     main()
