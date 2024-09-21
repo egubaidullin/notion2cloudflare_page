@@ -91,7 +91,7 @@ def deploy_to_cloudflare(html_content):
     
     headers = {
         "Authorization": f"Bearer {CLOUDFLARE_API_TOKEN}",
-        "Content-Type": "application/json"
+        "Content-Type": "multipart/form-data"
     }
 
     # Создаем временный файл index.html
@@ -100,23 +100,26 @@ def deploy_to_cloudflare(html_content):
 
     # Создаем манифест файлов
     manifest = {
-        "index.html": {
-            "etag": "etag",  # Можно оставить как есть или использовать хеш файла
-            "size": os.path.getsize('index.html')
-        }
+        "version": 1,
+        "include": ["index.html"],
+        "exclude": []
     }
 
     # Формируем данные для отправки
-    data = {
-        "manifest": json.dumps(manifest),
-        "branch": "main"  # или используйте нужную вам ветку
-    }
-
     files = {
+        'manifest': ('manifest.json', json.dumps(manifest), 'application/json'),
         'index.html': ('index.html', open('index.html', 'rb'), 'text/html')
     }
 
+    data = {
+        "branch": "main"  # или используйте нужную вам ветку
+    }
+
     try:
+        logging.info(f"Sending request to URL: {url}")
+        logging.info(f"Headers: {headers}")
+        logging.info(f"Data: {data}")
+        logging.info(f"Files: {files.keys()}")
         response = requests.post(url, headers=headers, data=data, files=files)
         response.raise_for_status()
         deployment = response.json()
@@ -132,6 +135,9 @@ def deploy_to_cloudflare(html_content):
 
 def main():
     try:
+        logging.info(f"CLOUDFLARE_ACCOUNT_ID: {CLOUDFLARE_ACCOUNT_ID}")
+        logging.info(f"CLOUDFLARE_PROJECT: {CLOUDFLARE_PROJECT}")
+        logging.info(f"CLOUDFLARE_API_TOKEN: {'*' * len(CLOUDFLARE_API_TOKEN) if CLOUDFLARE_API_TOKEN else 'Not set'}")
         logging.info("Starting Notion page sync...")
         html_content = get_notion_content()
         processed_html = process_html(html_content)
