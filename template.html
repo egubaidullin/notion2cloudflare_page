@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ title }}</title>
     <style>
+        /* Basic styles for body and content */
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
             line-height: 1.6;
@@ -12,93 +13,78 @@
             margin: 0;
             padding: 20px;
         }
+
         .content {
-            max-width: 900px;
-            margin: 0 auto;
+            max-width: 900px; /* Limit content width */
+            margin: 0 auto;   /* Center content */
         }
+
         h1, h2, h3 {
             margin-top: 24px;
             margin-bottom: 16px;
         }
+
         pre {
             background-color: #f6f6f6;
             padding: 16px;
             border-radius: 4px;
             overflow-x: auto;
-            white-space: pre-wrap;
         }
+
         code {
             font-family: SFMono-Regular, Consolas, 'Liberation Mono', Menlo, Courier, monospace;
-            color: #d63384;
         }
-        .toc {
-            background-color: #f9f9f9;
-            padding: 16px;
-            margin-bottom: 20px;
-            border-radius: 5px;
-        }
-        ul {
-            list-style-type: none;
-            padding: 0;
-        }
-        ul li {
-            margin-bottom: 10px;
-        }
-        ul li a {
-            text-decoration: none;
-            color: #007bff;
-        }
-        ul li a:hover {
-            text-decoration: underline;
-        }
+
         .callout {
             background-color: #f1f1f1;
             padding: 16px;
             border-radius: 4px;
             margin-bottom: 16px;
         }
+
         img {
             max-width: 100%;
             height: auto;
         }
-        .back-to-top {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background-color: #007bff;
-            color: white;
-            padding: 10px 15px;
-            border-radius: 5px;
-            text-decoration: none;
-            display: none;
+
+        /* Styles for the Table of Contents */
+        .toc {
+            max-width: 900px; /* Set max width for TOC */
+            margin: 0px auto; /* Center TOC */
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            top: 100px; /* Vertical position */
+            left: 20px; /* Align with content */
         }
-        .back-to-top:hover {
-            background-color: #0056b3;
+
+        .toc a {
+            text-decoration: none; /* Remove underline from links */
+            color: #333; /* Link color */
+        }
+
+        .toc ul {
+            list-style-type: none; /* Remove bullet points */
+            padding: 0;
+            margin: 0;
+        }
+
+        .toc ul ul {
+            margin-left: 20px; /* Indent nested items */
         }
     </style>
 </head>
 <body>
     <div class="toc">
-        <h2>Table of Contents</h2>
+        <h3>Table of Contents</h3>
         <ul>
-            {{ toc|safe }}
+            {{ toc }} <!-- TOC dynamically generated here -->
         </ul>
     </div>
+    
     <div class="content">
-        {{ content|safe }}
+        {{ content }} <!-- Main content dynamically generated here -->
     </div>
-    <a href="#top" class="back-to-top">Back to top</a>
-
-    <script>
-        // Show "Back to top" button when scrolling down
-        window.onscroll = function() {
-            var topButton = document.querySelector('.back-to-top');
-            if (document.documentElement.scrollTop > 300) {
-                topButton.style.display = 'block';
-            } else {
-                topButton.style.display = 'none';
-            }
-        };
-    </script>
 </body>
 </html>
