@@ -43,9 +43,18 @@ def get_notion_content():
 
     return all_blocks
 
-def convert_to_html(blocks, level=0):
+def get_notion_title():
+    url = f"https://api.notion.com/v1/pages/{NOTION_PAGE_ID}"
+    response = requests.get(url, headers=headers)
+    response.raise_for_status()
+    page_data = response.json()
+    return page_data["properties"]["title"]["title"][0]["plain_text"]
+
+def convert_to_html(blocks):
     html_content = []
+    toc = []
     list_type = None
+    heading_count = 0
 
     for block in blocks:
         block_type = block['type']
@@ -53,7 +62,11 @@ def convert_to_html(blocks, level=0):
             html_content.append(f"<p>{get_text_content(block['paragraph']['rich_text'])}</p>")
         elif block_type.startswith('heading_'):
             level = int(block_type[-1])
-            html_content.append(f"<h{level}>{get_text_content(block[block_type]['rich_text'])}</h{level}>")
+            heading_count += 1
+            heading_id = f"heading-{heading_count}"
+            text = get_text_content(block[block_type]['rich_text'])
+            toc.append(f"<li><a href='#{heading_id}'>{text}</a></li>")
+            html_content.append(f"<h{level} id='{heading_id}'>{text}</h{level}>")
         elif block_type == 'bulleted_list_item':
             if list_type != 'ul':
                 if list_type:
@@ -86,12 +99,12 @@ def convert_to_html(blocks, level=0):
         
         if 'has_children' in block and block['has_children']:
             child_blocks = get_child_blocks(block['id'])
-            html_content.extend(convert_to_html(child_blocks, level + 1))
+            html_content.extend(convert_to_html(child_blocks))
 
     if list_type:
         html_content.append(f"</{'ol' if list_type == 'ol' else 'ul'}>")
 
-    return html_content
+    return toc, html_content
 
 def get_child_blocks(block_id):
     url = f"https://api.notion.com/v1/blocks/{block_id}/children"
@@ -102,7 +115,7 @@ def get_child_blocks(block_id):
 def get_text_content(rich_text):
     return ''.join([t['plain_text'] for t in rich_text])
 
-def save_html(html_content, filename='index.html'):
+def save_html(html_content, toc, title, filename='index.html'):
     try:
         full_html = f"""
         <!DOCTYPE html>
@@ -110,7 +123,7 @@ def save_html(html_content, filename='index.html'):
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Tips and scripts for the job</title>
+            <title>{title}</title>
             <style>
                 body {{
                     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
@@ -146,12 +159,59 @@ def save_html(html_content, filename='index.html'):
                     max-width: 100%;
                     height: auto;
                 }}
+                .toc {{
+                    background: #f9f9f9;
+                    padding: 10px;
+                    border-radius: 8px;
+                    margin-bottom: 20px;
+                }}
+                .toc ul {{
+                    list-style: none;
+                    padding-left: 0;
+                }}
+                .toc li {{
+                    margin-bottom: 8px;
+                }}
+                #back-to-top {{
+                    position: fixed;
+                    bottom: 20px;
+                    right: 20px;
+                    background-color: #007bff;
+                    color: white;
+                    padding: 10px;
+                    border-radius: 50%;
+                    cursor: pointer;
+                    display: none;
+                }}
             </style>
+            <script>
+                document.addEventListener("DOMContentLoaded", function() {{
+                    const backToTopBtn = document.getElementById("back-to-top");
+                    window.addEventListener("scroll", function() {{
+                        if (window.pageYOffset > 100) {{
+                            backToTopBtn.style.display = "block";
+                        }} else {{
+                            backToTopBtn.style.display = "none";
+                        }}
+                    }});
+
+                    backToTopBtn.addEventListener("click", function() {{
+                        window.scrollTo({{top: 0, behavior: "smooth"}});
+                    }});
+                }});
+            </script>
         </head>
         <body>
             <div class="content">
+                <div class="toc">
+                    <h2>Table of Contents</h2>
+                    <ul>
+                        {''.join(toc)}
+                    </ul>
+                </div>
                 {''.join(html_content)}
             </div>
+            <div id="back-to-top">↑</div>
         </body>
         </html>
         """
@@ -166,8 +226,9 @@ def main():
     try:
         logging.info("Starting Notion page sync...")
         notion_content = get_notion_content()
-        html_content = convert_to_html(notion_content)
-        save_html(html_content)
+        title = get_notion_title()
+        toc, html_content = convert_to_html(notion_content)
+        save_html(html_content, toc, title)
         logging.info("Sync completed successfully")
     except Exception as e:
         logging.error(f"Sync failed: {e}")
