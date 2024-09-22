@@ -17,7 +17,6 @@
             --font-size-h3: 1.5rem;
             --line-height: 1.6;
             --toc-width: 250px;
-            --header-height: 60px;
         }
 
         :root.dark-theme {
@@ -37,34 +36,15 @@
             transition: background-color 0.3s ease, color 0.3s ease;
         }
 
-        .header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: var(--header-height);
-            background-color: var(--bg-color);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            display: flex;
-            align-items: center;
-            padding: 0 20px;
-            z-index: 1000;
-        }
-
-        .header h1 {
-            margin: 0;
-            font-size: 1.5rem;
-        }
-
         .content {
             max-width: calc(100% - var(--toc-width) - 40px);
             margin-left: calc(var(--toc-width) + 20px);
-            padding: 80px 20px 40px;
+            padding: 40px 20px;
         }
 
         h1, h2, h3 {
-            margin-top: 2em;
-            margin-bottom: 1em;
+            margin-top: 1em;
+            margin-bottom: 0.5em;
             font-weight: 600;
             line-height: 1.2;
         }
@@ -111,6 +91,18 @@
             box-shadow: 2px 0 4px rgba(0,0,0,0.1);
         }
 
+        .toc {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: var(--toc-width);
+            height: 100vh;
+            overflow-y: auto;
+            background-color: var(--bg-color);
+            padding: 20px;
+            box-shadow: 2px 0 4px rgba(0,0,0,0.1);
+        }
+
         .toc a {
             text-decoration: none;
             color: var(--text-color);
@@ -133,6 +125,7 @@
         .toc ul ul {
             margin-left: 15px;
         }
+
 
         #scrollToTopButton {
             position: fixed;
@@ -164,7 +157,10 @@
         }
 
         .theme-switch-wrapper {
-            margin-left: auto;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
         }
 
         .theme-switch {
@@ -223,17 +219,6 @@
                 --toc-width: 100%;
             }
 
-            .header {
-                flex-direction: column;
-                height: auto;
-                padding: 10px;
-            }
-
-            .theme-switch-wrapper {
-                margin-left: 0;
-                margin-top: 10px;
-            }
-
             .toc {
                 position: static;
                 width: auto;
@@ -249,27 +234,30 @@
                 margin-left: 0;
                 padding: 20px;
             }
+
+            .theme-switch-wrapper {
+                position: static;
+                margin-bottom: 20px;
+            }
         }
     </style>
 </head>
 <body>
-    <header class="header">
-        <h1>{{ title }}</h1>
-        <div class="theme-switch-wrapper">
-            <label class="theme-switch" for="checkbox">
-                <input type="checkbox" id="checkbox" />
-                <div class="slider"></div>
-            </label>
-        </div>
-    </header>
-
     <nav class="toc">
         <ul>
             {{ toc }}
         </ul>
     </nav>
 
+    <div class="theme-switch-wrapper">
+        <label class="theme-switch" for="checkbox">
+            <input type="checkbox" id="checkbox" />
+            <div class="slider"></div>
+        </label>
+    </div>
+
     <main class="content">
+        <h1>{{ title }}</h1>
         {{ content }}
     </main>
 
