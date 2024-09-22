@@ -16,6 +16,8 @@
             --font-size-h2: 2rem;
             --font-size-h3: 1.5rem;
             --line-height: 1.6;
+            --toc-width: 250px;
+            --header-height: 60px;
         }
 
         :root.dark-theme {
@@ -35,10 +37,29 @@
             transition: background-color 0.3s ease, color 0.3s ease;
         }
 
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--header-height);
+            background-color: var(--bg-color);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            z-index: 1000;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
         .content {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 40px 20px;
+            max-width: calc(100% - var(--toc-width) - 40px);
+            margin-left: calc(var(--toc-width) + 20px);
+            padding: 80px 20px 40px;
         }
 
         h1, h2, h3 {
@@ -80,15 +101,14 @@
 
         .toc {
             position: fixed;
-            top: 20px;
-            left: 20px;
-            width: 250px;
-            max-height: calc(100vh - 40px);
+            top: var(--header-height);
+            left: 0;
+            width: var(--toc-width);
+            height: calc(100vh - var(--header-height));
             overflow-y: auto;
             background-color: var(--bg-color);
             padding: 20px;
-            border-radius: var(--border-radius);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 2px 0 4px rgba(0,0,0,0.1);
         }
 
         .toc a {
@@ -97,6 +117,7 @@
             transition: color 0.3s ease;
             display: block;
             padding: 5px 0;
+            font-size: 0.9em;
         }
 
         .toc a:hover, .toc a.active {
@@ -143,11 +164,7 @@
         }
 
         .theme-switch-wrapper {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            display: flex;
-            align-items: center;
+            margin-left: auto;
         }
 
         .theme-switch {
@@ -193,23 +210,6 @@
             transform: translateX(26px);
         }
 
-        .parallax-header {
-            height: 300px;
-            background-image: url('https://source.unsplash.com/random/1600x900');
-            background-attachment: fixed;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-size: cover;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .parallax-header h1 {
-            color: white;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-        }
-
         blockquote {
             border-left: 4px solid var(--accent-color);
             margin: 0;
@@ -219,47 +219,61 @@
         }
 
         @media (max-width: 768px) {
+            :root {
+                --toc-width: 100%;
+            }
+
+            .header {
+                flex-direction: column;
+                height: auto;
+                padding: 10px;
+            }
+
+            .theme-switch-wrapper {
+                margin-left: 0;
+                margin-top: 10px;
+            }
+
             .toc {
                 position: static;
                 width: auto;
-                max-height: none;
+                height: auto;
+                max-height: 300px;
                 margin-bottom: 20px;
+                box-shadow: none;
+                border-bottom: 1px solid var(--accent-color);
             }
 
             .content {
+                max-width: 100%;
+                margin-left: 0;
                 padding: 20px;
-            }
-
-            .parallax-header {
-                height: 200px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="parallax-header">
+    <header class="header">
         <h1>{{ title }}</h1>
-    </div>
+        <div class="theme-switch-wrapper">
+            <label class="theme-switch" for="checkbox">
+                <input type="checkbox" id="checkbox" />
+                <div class="slider"></div>
+            </label>
+        </div>
+    </header>
 
-    <button id="scrollToTopButton" title="Go to top">↑</button>
-
-    <div class="theme-switch-wrapper">
-        <label class="theme-switch" for="checkbox">
-            <input type="checkbox" id="checkbox" />
-            <div class="slider"></div>
-        </label>
-    </div>
-
-    <div class="toc">
-        <h2>Table of Contents</h2>
+    <nav class="toc">
         <ul>
             {{ toc }}
         </ul>
-    </div>
+    </nav>
 
-    <div class="content">
+    <main class="content">
         {{ content }}
-    </div>
+    </main>
+
+    <button id="scrollToTopButton" title="Go to top">↑</button>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
