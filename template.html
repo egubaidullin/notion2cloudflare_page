@@ -5,189 +5,277 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ title }}</title>
     <style>
-        /* Basic styles for body and content */
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #333333;
+            --accent-color: #4a90e2;
+            --secondary-bg: #f7f7f7;
+            --border-radius: 12px;
+            --font-size-base: 16px;
+            --font-size-h1: 2.5rem;
+            --font-size-h2: 2rem;
+            --font-size-h3: 1.5rem;
+            --line-height: 1.6;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #1a1a1a;
+                --text-color: #e0e0e0;
+                --secondary-bg: #2a2a2a;
+            }
+        }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-            line-height: 1.6;
-            color: #37352f;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+            line-height: var(--line-height);
+            color: var(--text-color);
+            background-color: var(--bg-color);
             margin: 0;
-            padding: 20px;
+            padding: 0;
+            font-size: var(--font-size-base);
             transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         .content {
-            max-width: 900px; /* Limit content width */
-            margin: 0 auto;   /* Center content */
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
         }
 
         h1, h2, h3 {
-            margin-top: 24px;
-            margin-bottom: 16px;
+            margin-top: 2em;
+            margin-bottom: 1em;
+            font-weight: 600;
+            line-height: 1.2;
         }
 
+        h1 { font-size: var(--font-size-h1); }
+        h2 { font-size: var(--font-size-h2); }
+        h3 { font-size: var(--font-size-h3); }
+
         pre {
-            background-color: #f6f6f6;
-            padding: 16px;
-            border-radius: 4px;
+            background-color: var(--secondary-bg);
+            padding: 20px;
+            border-radius: var(--border-radius);
             overflow-x: auto;
+            font-size: 0.9em;
         }
 
         code {
-            font-family: SFMono-Regular, Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+            font-family: 'Fira Code', 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
         }
 
         .callout {
-            background-color: #f1f1f1;
-            padding: 16px;
-            border-radius: 4px;
-            margin-bottom: 16px;
+            background-color: var(--secondary-bg);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+            border-left: 4px solid var(--accent-color);
         }
 
         img {
             max-width: 100%;
             height: auto;
+            border-radius: var(--border-radius);
         }
 
-        /* Styles for the Table of Contents */
         .toc {
-            max-width: 900px; /* Set max width for TOC */
-            margin: 0px auto; /* Center TOC */
-            background-color: #f9f9f9;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            width: 250px;
+            max-height: calc(100vh - 40px);
+            overflow-y: auto;
+            background-color: var(--bg-color);
             padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            top: 100px; /* Vertical position */
-            left: 20px; /* Align with content */
+            border-radius: var(--border-radius);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
         .toc a {
-            text-decoration: none; /* Remove underline from links */
-            color: #333; /* Link color */
-            transition: color 0.3s ease; /* Плавный переход цвета */
+            text-decoration: none;
+            color: var(--text-color);
+            transition: color 0.3s ease;
+            display: block;
+            padding: 5px 0;
         }
 
-        /* Стили для hover-эффекта */
-        .toc a:hover {
-            color: #0056b3; /* Цвет ссылки при наведении */
+        .toc a:hover, .toc a.active {
+            color: var(--accent-color);
         }
 
         .toc ul {
-            list-style-type: none; /* Remove bullet points */
+            list-style-type: none;
             padding: 0;
             margin: 0;
         }
 
         .toc ul ul {
-            margin-left: 20px; /* Indent nested items */
+            margin-left: 15px;
         }
 
-        /* CSS для кнопки "Наверх" */
         #scrollToTopButton {
             position: fixed;
             bottom: 20px;
             right: 20px;
-            background-color: #007BFF;
+            background-color: var(--accent-color);
             color: white;
             border: none;
             border-radius: 50%;
             width: 50px;
             height: 50px;
+            font-size: 24px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            opacity: 0.7;
-            transition: opacity 0.3s ease;
-            display: none; /* Скрываем кнопку по умолчанию */
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            opacity: 0;
+            transform: translateY(100px);
+        }
+
+        #scrollToTopButton.visible {
+            opacity: 1;
+            transform: translateY(0);
         }
 
         #scrollToTopButton:hover {
-            opacity: 1;
+            transform: translateY(-5px);
         }
 
-        /* CSS для кнопки переключения цвета */
-        #colorToggleButton {
+        .theme-switch-wrapper {
             position: fixed;
             top: 20px;
             right: 20px;
-            background-color: #007BFF;
-            color: white;
-            border: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .theme-switch {
+            display: inline-block;
+            height: 34px;
+            position: relative;
+            width: 60px;
+        }
+
+        .theme-switch input {
+            display: none;
+        }
+
+        .slider {
+            background-color: #ccc;
+            bottom: 0;
+            cursor: pointer;
+            left: 0;
+            position: absolute;
+            right: 0;
+            top: 0;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            background-color: #fff;
+            bottom: 4px;
+            content: "";
+            height: 26px;
+            left: 4px;
+            position: absolute;
+            transition: .4s;
+            width: 26px;
             border-radius: 50%;
-            width: 50px;
-            height: 50px;
+        }
+
+        input:checked + .slider {
+            background-color: var(--accent-color);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .parallax-header {
+            height: 300px;
+            background-image: url('https://source.unsplash.com/random/1600x900');
+            background-attachment: fixed;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
-            opacity: 0.7;
-            transition: opacity 0.3s ease;
         }
 
-        #colorToggleButton:hover {
-            opacity: 1;
+        .parallax-header h1 {
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
         }
 
-        /* Dark mode styles */
-        body.dark-mode {
-            background-color: #121212;
-            color: #e0e0e0;
+        blockquote {
+            border-left: 4px solid var(--accent-color);
+            margin: 0;
+            padding-left: 20px;
+            font-style: italic;
+            color: #666;
         }
 
-        .dark-mode .toc {
-            background-color: #1e1e1e;
-        }
+        @media (max-width: 768px) {
+            .toc {
+                position: static;
+                width: auto;
+                max-height: none;
+                margin-bottom: 20px;
+            }
 
-        .dark-mode .toc a {
-            color: #e0e0e0;
-        }
+            .content {
+                padding: 20px;
+            }
 
-        .dark-mode .toc a:hover {
-            color: #bb86fc;
-        }
-
-        .dark-mode .content {
-            background-color: #1e1e1e;
-        }
-
-        .dark-mode pre {
-            background-color: #2e2e2e;
-        }
-
-        .dark-mode .callout {
-            background-color: #3e3e3e;
+            .parallax-header {
+                height: 200px;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- HTML для кнопки "Наверх" -->
-    <button id="scrollToTopButton" title="Go to top">Top</button>
+    <div class="parallax-header">
+        <h1>{{ title }}</h1>
+    </div>
 
-    <!-- HTML для кнопки переключения цвета -->
-    <button id="colorToggleButton" title="Toggle dark mode">🌙</button>
+    <button id="scrollToTopButton" title="Go to top">↑</button>
+
+    <div class="theme-switch-wrapper">
+        <label class="theme-switch" for="checkbox">
+            <input type="checkbox" id="checkbox" />
+            <div class="slider"></div>
+        </label>
+    </div>
 
     <div class="toc">
-        <h3>{{ title }}</h3>
-        <h1>Table of Contents</h1>
+        <h2>Table of Contents</h2>
         <ul>
-            {{ toc }} <!-- TOC dynamically generated here -->
+            {{ toc }}
         </ul>
     </div>
 
     <div class="content">
-        {{ content }} <!-- Main content dynamically generated here -->
+        {{ content }}
     </div>
 
-    <!-- JavaScript для кнопки "Наверх" -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const scrollToTopButton = document.getElementById('scrollToTopButton');
+            const checkbox = document.getElementById('checkbox');
+            const toc = document.querySelector('.toc');
+            const tocLinks = toc.getElementsByTagName('a');
 
+            // Scroll to Top Button
             window.addEventListener('scroll', function() {
                 if (window.pageYOffset > 100) {
-                    scrollToTopButton.style.display = 'block';
+                    scrollToTopButton.classList.add('visible');
                 } else {
-                    scrollToTopButton.style.display = 'none';
+                    scrollToTopButton.classList.remove('visible');
                 }
             });
 
@@ -197,16 +285,42 @@
                     behavior: 'smooth'
                 });
             });
-        });
-    </script>
 
-    <!-- JavaScript для кнопки переключения цвета -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const colorToggleButton = document.getElementById('colorToggleButton');
-
-            colorToggleButton.addEventListener('click', function() {
+            // Theme Switch
+            checkbox.addEventListener('change', function() {
                 document.body.classList.toggle('dark-mode');
+            });
+
+            // Smooth scrolling for ToC links
+            Array.from(tocLinks).forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href').substring(1);
+                    const targetElement = document.getElementById(targetId);
+                    if (targetElement) {
+                        targetElement.scrollIntoView({
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+
+            // Active ToC link highlighting
+            window.addEventListener('scroll', function() {
+                let fromTop = window.scrollY + 100;
+
+                Array.from(tocLinks).forEach(link => {
+                    let section = document.querySelector(link.hash);
+
+                    if (
+                        section.offsetTop <= fromTop &&
+                        section.offsetTop + section.offsetHeight > fromTop
+                    ) {
+                        link.classList.add('active');
+                    } else {
+                        link.classList.remove('active');
+                    }
+                });
             });
         });
     </script>
