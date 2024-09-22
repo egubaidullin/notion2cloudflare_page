@@ -124,6 +124,22 @@ def get_title(page_id):
         logging.error(f"Error fetching page title: {e}")
         raise
 
+def fetch_page_data(page_id):
+    try:
+        url = f"https://api.notion.com/v1/pages/{page_id}"
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        page_data = response.json()
+
+        # Вывести все данные страницы для анализа
+        print(json.dumps(page_data, indent=4))  # Выводим ответ красиво отформатированным
+
+        return page_data
+
+    except requests.RequestException as e:
+        logging.error(f"Error fetching page data: {e}")
+        raise
+
 def generate_toc(blocks):
     toc = []
     for block in blocks:
@@ -155,12 +171,7 @@ def save_html(toc, html_content, title, filename='index.html'):
 def main():
     try:
         logging.info("Starting Notion page sync...")
-        notion_content = get_notion_content()
-        html_content = convert_to_html(notion_content)
-        title = get_title(NOTION_PAGE_ID)  # Получаем заголовок страницы
-        toc = generate_toc(notion_content)  # Generate TOC from Notion content
-        save_html(toc, html_content, title)  # Call save_html with TOC, content, and title
-        logging.info("Sync completed successfully")
+        fetch_page_data(NOTION_PAGE_ID)  # Получаем и выводим все данные страницы
     except Exception as e:
         logging.error(f"Sync failed: {e}")
         raise
