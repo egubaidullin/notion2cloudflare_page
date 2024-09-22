@@ -106,16 +106,23 @@ def get_text_content(rich_text):
     return ''.join([t['plain_text'] for t in rich_text])
 
 def get_title(page_id):
-    url = f"https://api.notion.com/v1/pages/{page_id}"
-    response = requests.get(url, headers=headers)
-    response.raise_for_status()
-    page_data = response.json()
+    try:
+        url = f"https://api.notion.com/v1/pages/{page_id}"
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        page_data = response.json()
+
+        # Получаем заголовок страницы из свойств страницы
+        title_property = page_data.get("properties", {}).get("Name", {}).get("title", [])
+        if title_property:
+            return title_property[0]["text"]["content"]
+        
+        logging.warning("Page title not found.")
+        return "Your Page Title from Notion"
     
-    # Получаем заголовок страницы из свойств
-    if 'properties' in page_data and 'Name' in page_data['properties']:
-        return page_data['properties']['Name']['title'][0]['text']['content']
-    
-    return "Your Page Title from Notion"
+    except requests.RequestException as e:
+        logging.error(f"Error fetching page title: {e}")
+        raise
 
 def generate_toc(blocks):
     toc = []
