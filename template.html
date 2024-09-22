@@ -18,12 +18,10 @@
             --line-height: 1.6;
         }
 
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --bg-color: #1a1a1a;
-                --text-color: #e0e0e0;
-                --secondary-bg: #2a2a2a;
-            }
+        :root.dark-theme {
+            --bg-color: #1a1a1a;
+            --text-color: #e0e0e0;
+            --secondary-bg: #2a2a2a;
         }
 
         body {
@@ -270,6 +268,33 @@
             const toc = document.querySelector('.toc');
             const tocLinks = toc.getElementsByTagName('a');
 
+            // Theme Switch
+            function setTheme(theme) {
+                if (theme === 'dark') {
+                    document.documentElement.classList.add('dark-theme');
+                    checkbox.checked = true;
+                } else {
+                    document.documentElement.classList.remove('dark-theme');
+                    checkbox.checked = false;
+                }
+                localStorage.setItem('theme', theme);
+            }
+
+            // Check for saved theme preference or use user's system preference
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+                setTheme(savedTheme);
+            } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                setTheme('dark');
+            } else {
+                setTheme('light');
+            }
+
+            // Theme switch event listener
+            checkbox.addEventListener('change', function() {
+                setTheme(this.checked ? 'dark' : 'light');
+            });
+
             // Scroll to Top Button
             window.addEventListener('scroll', function() {
                 if (window.pageYOffset > 100) {
@@ -284,11 +309,6 @@
                     top: 0,
                     behavior: 'smooth'
                 });
-            });
-
-            // Theme Switch
-            checkbox.addEventListener('change', function() {
-                document.body.classList.toggle('dark-mode');
             });
 
             // Smooth scrolling for ToC links
