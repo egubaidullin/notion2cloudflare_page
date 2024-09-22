@@ -1,7 +1,6 @@
 import os
 import requests
 import logging
-import json
 from html import escape
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -113,32 +112,16 @@ def get_title(page_id):
         response.raise_for_status()
         page_data = response.json()
 
-        # Получаем заголовок страницы из свойств страницы
-        title_property = page_data.get("properties", {}).get("Name", {}).get("title", [])
+        # Получаем заголовок страницы из свойства title
+        title_property = page_data.get("properties", {}).get("title", {}).get("title", [])
         if title_property:
             return title_property[0]["text"]["content"]
-        
+
         logging.warning("Page title not found.")
         return "Your Page Title from Notion"
-    
+
     except requests.RequestException as e:
         logging.error(f"Error fetching page title: {e}")
-        raise
-
-def fetch_page_data(page_id):
-    try:
-        url = f"https://api.notion.com/v1/pages/{page_id}"
-        response = requests.get(url, headers=headers)
-        response.raise_for_status()
-        page_data = response.json()
-
-        # Вывести все данные страницы для анализа
-        print(json.dumps(page_data, indent=4))  # Выводим ответ красиво отформатированным
-
-        return page_data
-
-    except requests.RequestException as e:
-        logging.error(f"Error fetching page data: {e}")
         raise
 
 def generate_toc(blocks):
@@ -172,7 +155,12 @@ def save_html(toc, html_content, title, filename='index.html'):
 def main():
     try:
         logging.info("Starting Notion page sync...")
-        fetch_page_data(NOTION_PAGE_ID)  # Получаем и выводим все данные страницы
+        notion_content = get_notion_content()
+        html_content = convert_to_html(notion_content)
+        title = get_title(NOTION_PAGE_ID)  # Получаем заголовок страницы
+        toc = generate_toc(notion_content)  # Generate TOC from Notion content
+        save_html(toc, html_content, title)  # Call save_html with TOC, content, and title
+        logging.info("Sync completed successfully")
     except Exception as e:
         logging.error(f"Sync failed: {e}")
         raise
