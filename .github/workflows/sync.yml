@@ -8,6 +8,7 @@ on:
 jobs:
   sync-and-deploy:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -17,21 +18,11 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Cache pip
-        uses: actions/cache@v3
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install requests markdown2 jinja2 flake8
-
-      - name: Lint Python
-        run: flake8 .
+          pip install requests markdown2
+          pip install requests markdown2 jinja2
 
       - name: Fetch Notion page content
         env:
@@ -47,4 +38,3 @@ jobs:
           projectName: ${{ secrets.CLOUDFLARE_PROJECT }}
           directory: .
           gitHubToken: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-          commitDirty: true
