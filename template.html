@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ title }}</title>
     <style>
+        /* Root variables for easy theme switching */
         :root {
             --bg-color: #ffffff;
             --text-color: #333333;
@@ -19,12 +20,14 @@
             --toc-width: 250px;
         }
 
+        /* Dark theme variables */
         :root.dark-theme {
             --bg-color: #1a1a1a;
             --text-color: #e0e0e0;
             --secondary-bg: #2a2a2a;
         }
 
+        /* Base styles */
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
             line-height: var(--line-height);
@@ -36,12 +39,14 @@
             transition: background-color 0.3s ease, color 0.3s ease;
         }
 
+        /* Main content area */
         .content {
             max-width: calc(100% - var(--toc-width) - 40px);
             margin-left: calc(var(--toc-width) + 20px);
             padding: 40px 20px;
         }
 
+        /* Headings */
         h1, h2, h3 {
             margin-top: 1em;
             margin-bottom: 0.5em;
@@ -53,6 +58,7 @@
         h2 { font-size: var(--font-size-h2); }
         h3 { font-size: var(--font-size-h3); }
 
+        /* Code blocks */
         pre {
             background-color: var(--secondary-bg);
             padding: 20px;
@@ -65,6 +71,7 @@
             font-family: 'Fira Code', 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
         }
 
+        /* Callout boxes */
         .callout {
             background-color: var(--secondary-bg);
             padding: 20px;
@@ -73,24 +80,14 @@
             border-left: 4px solid var(--accent-color);
         }
 
+        /* Images */
         img {
             max-width: 100%;
             height: auto;
             border-radius: var(--border-radius);
         }
 
-        .toc {
-            position: fixed;
-            top: var(--header-height);
-            left: 0;
-            width: var(--toc-width);
-            height: calc(100vh - var(--header-height));
-            overflow-y: auto;
-            background-color: var(--bg-color);
-            padding: 20px;
-            box-shadow: 2px 0 4px rgba(0,0,0,0.1);
-        }
-
+        /* Table of Contents */
         .toc {
             position: fixed;
             top: 0;
@@ -126,6 +123,7 @@
             margin-left: 15px;
         }
 
+        /* Scroll to Top Button */
         #scrollToTopButton {
             position: fixed;
             bottom: 20px;
@@ -155,6 +153,7 @@
             transform: translateY(-5px);
         }
 
+        /* Theme Switch */
         .theme-switch-wrapper {
             position: fixed;
             top: 20px;
@@ -205,6 +204,7 @@
             transform: translateX(26px);
         }
 
+        /* Blockquotes */
         blockquote {
             border-left: 4px solid var(--accent-color);
             margin: 0;
@@ -213,6 +213,53 @@
             color: #666;
         }
 
+        /* Copy button styles */
+        .code-wrapper {
+            position: relative;
+        }
+
+        .copy-button {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            width: 30px;
+            height: 30px;
+            font-size: 16px;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .copy-button:hover {
+            opacity: 1;
+        }
+
+        /* Copy feedback styles */
+        .copy-feedback {
+            position: absolute;
+            top: 5px;
+            right: 40px;
+            background-color: var(--accent-color);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .copy-feedback.show {
+            opacity: 1;
+        }
+
+        /* Responsive styles */
         @media (max-width: 768px) {
             :root {
                 --toc-width: 100%;
@@ -238,48 +285,6 @@
                 position: static;
                 margin-bottom: 20px;
             }
-        }
-
-        /* Добавляем стили для кнопки копирования */
-        .code-wrapper {
-            position: relative;
-        }
-
-        .copy-button {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            background-color: var(--accent-color);
-            color: white;
-            border: none;
-            border-radius: 4px;
-            padding: 5px 10px;
-            font-size: 12px;
-            cursor: pointer;
-            opacity: 0.7;
-            transition: opacity 0.3s ease;
-        }
-
-        .copy-button:hover {
-            opacity: 1;
-        }
-
-        /* Стиль для сообщения о копировании */
-        .copy-feedback {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            background-color: var(--accent-color);
-            color: white;
-            padding: 5px 10px;
-            border-radius: 4px;
-            font-size: 12px;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .copy-feedback.show {
-            opacity: 1;
         }
     </style>
 </head>
@@ -311,7 +316,7 @@
             const toc = document.querySelector('.toc');
             const tocLinks = toc.getElementsByTagName('a');
 
-            // Theme Switch
+            // Theme Switch functionality
             function setTheme(theme) {
                 if (theme === 'dark') {
                     document.documentElement.classList.add('dark-theme');
@@ -338,7 +343,7 @@
                 setTheme(this.checked ? 'dark' : 'light');
             });
 
-            // Scroll to Top Button
+            // Scroll to Top Button functionality
             window.addEventListener('scroll', function() {
                 if (window.pageYOffset > 100) {
                     scrollToTopButton.classList.add('visible');
@@ -386,31 +391,32 @@
                 });
             });
 
-            // Добавляем функциональность копирования кода
+            // Code block copy functionality
             const codeBlocks = document.querySelectorAll('pre');
-
+            
             codeBlocks.forEach((block, index) => {
-                // Создаем обертку для блока кода
+                // Create wrapper for code block
                 const wrapper = document.createElement('div');
                 wrapper.className = 'code-wrapper';
                 block.parentNode.insertBefore(wrapper, block);
                 wrapper.appendChild(block);
 
-                // Создаем кнопку копирования
+                // Create copy button
                 const copyButton = document.createElement('button');
-                copyButton.textContent = 'Copy';
+                copyButton.innerHTML = '&#128203;'; // Unicode symbol for "clipboard"
                 copyButton.className = 'copy-button';
+                copyButton.setAttribute('aria-label', 'Copy code to clipboard');
                 wrapper.appendChild(copyButton);
 
-                // Создаем элемент для обратной связи
+                // Create feedback element
                 const feedback = document.createElement('span');
                 feedback.textContent = 'Copied!';
                 feedback.className = 'copy-feedback';
                 wrapper.appendChild(feedback);
 
-                // Добавляем обработчик события для копирования
+                // Add event listener for copying
                 copyButton.addEventListener('click', () => {
-                    const code = block.textContent;
+                    const code = block.textContent || block.innerText;
                     navigator.clipboard.writeText(code).then(() => {
                         feedback.classList.add('show');
                         setTimeout(() => {
