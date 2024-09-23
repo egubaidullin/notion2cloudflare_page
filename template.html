@@ -126,7 +126,6 @@
             margin-left: 15px;
         }
 
-
         #scrollToTopButton {
             position: fixed;
             bottom: 20px;
@@ -240,6 +239,48 @@
                 margin-bottom: 20px;
             }
         }
+
+        /* Добавляем стили для кнопки копирования */
+        .code-wrapper {
+            position: relative;
+        }
+
+        .copy-button {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 5px 10px;
+            font-size: 12px;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+        }
+
+        .copy-button:hover {
+            opacity: 1;
+        }
+
+        /* Стиль для сообщения о копировании */
+        .copy-feedback {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: var(--accent-color);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .copy-feedback.show {
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
@@ -342,6 +383,42 @@
                     } else {
                         link.classList.remove('active');
                     }
+                });
+            });
+
+            // Добавляем функциональность копирования кода
+            const codeBlocks = document.querySelectorAll('pre');
+
+            codeBlocks.forEach((block, index) => {
+                // Создаем обертку для блока кода
+                const wrapper = document.createElement('div');
+                wrapper.className = 'code-wrapper';
+                block.parentNode.insertBefore(wrapper, block);
+                wrapper.appendChild(block);
+
+                // Создаем кнопку копирования
+                const copyButton = document.createElement('button');
+                copyButton.textContent = 'Copy';
+                copyButton.className = 'copy-button';
+                wrapper.appendChild(copyButton);
+
+                // Создаем элемент для обратной связи
+                const feedback = document.createElement('span');
+                feedback.textContent = 'Copied!';
+                feedback.className = 'copy-feedback';
+                wrapper.appendChild(feedback);
+
+                // Добавляем обработчик события для копирования
+                copyButton.addEventListener('click', () => {
+                    const code = block.textContent;
+                    navigator.clipboard.writeText(code).then(() => {
+                        feedback.classList.add('show');
+                        setTimeout(() => {
+                            feedback.classList.remove('show');
+                        }, 2000);
+                    }, (err) => {
+                        console.error('Failed to copy: ', err);
+                    });
                 });
             });
         });
