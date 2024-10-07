@@ -32,12 +32,7 @@ function scrollFunction() {
     if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
         scrollToTopBtn.style.display = "block";
     } else {
-        scrollToTopBtnВот продолжение кода в `script.js` и основные изменения:
-
-### Продолжение `script.js`:
-
-```javascript
-    scrollToTopBtn.style.display = "none";
+        scrollToTopBtn.style.display = "none";
     }
 }
 
@@ -48,13 +43,14 @@ scrollToTopBtn.addEventListener("click", function() {
 // TOC toggle
 const toggleTocBtn = document.querySelector('.toggle-toc');
 const sidebar = document.querySelector('.sidebar');
+const content = document.querySelector('.content');
 
 toggleTocBtn.addEventListener('click', () => {
     sidebar.classList.toggle('hidden');
     if (sidebar.classList.contains('hidden')) {
-        toggleTocBtn.textContent = 'Show TOC';
+        toggleTocBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
     } else {
-        toggleTocBtn.textContent = 'Hide TOC';
+        toggleTocBtn.innerHTML = '<i class="fas fa-bars"></i>';
     }
 });
 
@@ -68,7 +64,7 @@ document.querySelectorAll('pre').forEach((block) => {
     button.addEventListener('click', () => {
         navigator.clipboard.writeText(block.textContent).then(() => {
             const originalHTML = button.innerHTML;
-            button.innerHTML = 'Copied!';
+            button.innerHTML = '<i class="fas fa-check"></i>';
             button.disabled = true;
             setTimeout(() => {
                 button.innerHTML = originalHTML;
