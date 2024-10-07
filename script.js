@@ -57,13 +57,17 @@ toggleTocBtn.addEventListener('click', () => {
 document.querySelectorAll('pre').forEach((block) => {
     const button = document.createElement('button');
     button.className = 'copy-btn';
-    button.textContent = 'Copy';
+    button.innerHTML = '<i class="fas fa-copy"></i>';
+    button.title = 'Copy code';
     
     button.addEventListener('click', () => {
         navigator.clipboard.writeText(block.textContent).then(() => {
-            button.textContent = 'Copied!';
+            const originalHTML = button.innerHTML;
+            button.innerHTML = 'Copied!';
+            button.disabled = true;
             setTimeout(() => {
-                button.textContent = 'Copy';
+                button.innerHTML = originalHTML;
+                button.disabled = false;
             }, 2000);
         }, (err) => {
             console.error('Could not copy text: ', err);
