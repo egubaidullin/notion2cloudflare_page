@@ -164,7 +164,7 @@ def save_html(toc, html_content, title, filename, navigation):
 
         full_html = template.replace('{{ title }}', title) \
                             .replace('{{ toc }}', toc) \
-                            .replace(f'{{ content_{filename} }}', html_content) \
+                            .replace('{{ content }}', html_content) \
                             .replace('{{ pages_navigation }}', navigation)
 
         with open(f'{filename}.html', 'w', encoding='utf-8') as f:
