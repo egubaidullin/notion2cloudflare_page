@@ -40,10 +40,6 @@ body.dark-theme {
     --code-bg: var(--code-bg-dark);
 }
 
-body.dark-theme header {
-    background-color: var(--primary-color-dark);
-}
-
 .container {
     max-width: 1200px;
     margin: 0 auto;
@@ -59,6 +55,10 @@ header {
     top: 0;
     z-index: 1000;
     transition: background-color 0.3s;
+}
+
+body.dark-theme header {
+    background-color: var(--primary-color-dark);
 }
 
 .top-nav {
@@ -79,6 +79,12 @@ header {
     cursor: pointer;
     font-size: 1.5rem;
     margin-right: 1rem;
+}
+
+@media (max-width: 768px) {
+    .toggle-toc {
+        font-size: 2rem; /* Увеличиваем размер иконки */
+    }
 }
 
 .pages-navigation {
@@ -153,37 +159,6 @@ header {
     opacity: 1;
 }
 
-.slider {
-    background-color: #ccc;
-    bottom: 0;
-    cursor: pointer;
-    left: 0;
-    position: absolute;
-    right: 0;
-    top: 0;
-    transition: 0.4s;
-    border-radius: 34px;
-}
-
-.slider:before {
-    background-color: #fff;
-    bottom: 4px;
-    content: "";
-    height: 26px;
-    left: 4px;
-    position: absolute;
-    transition: 0.4s;
-    border-radius: 50%;
-}
-
-input:checked + .slider {
-    background-color: var(--secondary-color);
-}
-
-input:checked + .slider:before {
-    transform: translateX(26px);
-}
-
 .main-content {
     display: flex;
     margin-top: 70px;
@@ -241,6 +216,13 @@ input:checked + .slider:before {
     word-wrap: break-word;
     overflow-wrap: break-word;
     transition: margin-left 0.3s ease-in-out;
+}
+
+@media (max-width: 768px) {
+    .content {
+        margin-left: 20px;
+        font-size: 1.2em; /* Увеличиваем шрифт */
+    }
 }
 
 .sidebar.hidden + .content {
@@ -303,11 +285,6 @@ pre {
         transform: translateX(-100%);
     }
 
-    .content {
-        margin-left: 20px;
-        font-size: 1.2em; /* Увеличиваем шрифт */
-    }
-
     .top-nav {
         flex-direction: row;
         justify-content: space-between;
@@ -342,7 +319,4 @@ pre {
     .overlay.active {
         display: block;
     }
-    .toggle-toc {
-        font-size: 2rem; /* Увеличиваем размер иконки */
-    }    
 }
