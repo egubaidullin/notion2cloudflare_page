@@ -2,40 +2,19 @@ import os
 import requests
 import logging
 from html import escape
-from datetime import datetime
-import json
-from slugify import slugify
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 NOTION_API_TOKEN = os.getenv('NOTION_API_TOKEN')
-NOTION_PAGE_IDS = os.getenv('NOTION_PAGE_IDS').split(',')
-CLOUDFLARE_PAGES_DIR = 'pages'
+NOTION_PAGE_IDS = os.getenv('NOTION_PAGE_IDS').split(",")
 
 headers = {
     "Authorization": f"Bearer {NOTION_API_TOKEN}",
     "Notion-Version": "2022-06-28"
 }
 
-def sanitize_title(title, max_length=50):
-    """Sanitize and truncate the title."""
-    sanitized = slugify(title)
-    return sanitized[:max_length]
-
-def get_notion_page_info(page_id):
-    """Fetch page info including title, created and last edited time."""
-    url = f"https://api.notion.com/v1/pages/{page_id}"
-    response = requests.get(url, headers=headers)
-    response.raise_for_status()
-    page_data = response.json()
-    
-    title = page_data['properties']['title']['title'][0]['plain_text']
-    created_time = page_data['created_time']
-    last_edited_time = page_data['last_edited_time']
-    
-    return title, created_time, last_edited_time
-
 def get_notion_content(page_id):
+    notion_api_url = f"https://api.notion.com/v1/blocks/{page_id}/children"
     all_blocks = []
     has_more = True
     start_cursor = None
@@ -46,8 +25,7 @@ def get_notion_content(page_id):
             if start_cursor:
                 params["start_cursor"] = start_cursor
 
-            url = f"https://api.notion.com/v1/blocks/{page_id}/children"
-            response = requests.get(url, headers=headers, params=params)
+            response = requests.get(notion_api_url, headers=headers, params=params)
             response.raise_for_status()
             data = response.json()
 
@@ -55,7 +33,7 @@ def get_notion_content(page_id):
             has_more = data['has_more']
             start_cursor = data.get('next_cursor')
 
-            logging.info(f"Fetched {len(data['results'])} blocks. Total blocks: {len(all_blocks)}")
+            logging.info(f"Fetched {len(data['results'])} blocks for page {page_id}. Total blocks: {len(all_blocks)}")
 
         except requests.RequestException as e:
             logging.error(f"Error fetching Notion page content: {e}")
@@ -74,7 +52,7 @@ def convert_to_html(blocks):
         elif block_type.startswith('heading_'):
             level = int(block_type[-1])
             text = get_text_content(block[block_type]['rich_text'])
-            heading_id = slugify(text)
+            heading_id = text.replace(" ", "-").lower()
             html_content.append(f"<h{level} id='{heading_id}'>{text}</h{level}>")
         elif block_type == 'bulleted_list_item':
             if list_type != 'ul':
@@ -93,7 +71,7 @@ def convert_to_html(blocks):
         elif block_type == 'code':
             code = escape(get_text_content(block['code']['rich_text']))
             language = block['code']['language']
-            html_content.append(f"<pre><code class='language-{language}'>{code}</code></pre>")
+            html_content.append(f"<pre><code class='{language}'>{code}</code></pre>")
         elif block_type == 'image':
             image_url = block['image']['file']['url']
             html_content.append(f"<img src='{image_url}' alt='Notion image'>")
@@ -106,23 +84,34 @@ def convert_to_html(blocks):
             text = get_text_content(block['callout']['rich_text'])
             html_content.append(f"<div class='callout'>{emoji} {text}</div>")
         
+        # Process child blocks if present
         if 'has_children' in block and block['has_children']:
             child_blocks = get_child_blocks(block['id'])
             html_content.extend(convert_to_html(child_blocks))
 
+    # Close any open list
     if list_type:
         html_content.append(f"</{'ol' if list_type == 'ol' else 'ul'}>")
 
-    return ''.join(html_content)
+    return ''.join(html_content)  # Join the list into a single string
 
-def get_child_blocks(block_id):
-    url = f"https://api.notion.com/v1/blocks/{block_id}/children"
-    response = requests.get(url, headers=headers)
-    response.raise_for_status()
-    return response.json()['results']
+def get_title(page_id):
+    try:
+        url = f"https://api.notion.com/v1/pages/{page_id}"
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        page_data = response.json()
 
-def get_text_content(rich_text):
-    return ''.join([t['plain_text'] for t in rich_text])
+        title_property = page_data.get("properties", {}).get("title", {}).get("title", [])
+        if title_property:
+            return title_property[0]["text"]["content"]
+
+        logging.warning("Page title not found.")
+        return "Your Page Title from Notion"
+    
+    except requests.RequestException as e:
+        logging.error(f"Error fetching page title: {e}")
+        raise
 
 def generate_toc(blocks):
     toc = []
@@ -130,91 +119,69 @@ def generate_toc(blocks):
         if block['type'].startswith('heading_'):
             level = int(block['type'][-1])
             text = get_text_content(block[block['type']]['rich_text'])
-            heading_id = slugify(text)
+            heading_id = text.replace(" ", "-").lower()
             toc.append(f"<li class='toc-item' style='margin-left: {level * 20}px;'><a href='#{heading_id}'>{text}</a></li>")
     return "<ul class='toc'>" + ''.join(toc) + "</ul>"
 
-def save_html(toc, html_content, title, filename, created_time, last_edited_time, all_pages):
-    try:
-        with open('template2.html', 'r', encoding='utf-8') as f:
-            template = f.read()
+def generate_navigation(pages_data):
+    """
+    Generates navigation HTML with links to all pages.
+    :param pages_data: A list of tuples with (title, filename)
+    :return: Navigation HTML string
+    """
+    nav_html = "<ul>"
+    for title, filename in pages_data:
+        nav_html += f"<li><a href='{filename}.html'>{title}</a></li>"
+    nav_html += "</ul>"
+    return nav_html
 
-        menu = "<ul>"
-        for page in all_pages:
-            menu += f"<li><a href='/{page['path']}'>{page['title']}</a></li>"
-        menu += "</ul>"
+def save_html(toc, html_content, title, filename, navigation):
+    try:
+        with open('template.html', 'r', encoding='utf-8') as f:
+            template = f.read()
 
         full_html = template.replace('{{ title }}', title) \
                             .replace('{{ toc }}', toc) \
-                            .replace('{{ content }}', html_content) \
-                            .replace('{{ created_time }}', created_time) \
-                            .replace('{{ last_edited_time }}', last_edited_time) \
-                            .replace('{{ menu }}', menu)
+                            .replace(f'{{ content_{filename} }}', html_content) \
+                            .replace('{{ pages_navigation }}', navigation)
 
-        os.makedirs(os.path.dirname(filename), exist_ok=True)
-        with open(filename, 'w', encoding='utf-8') as f:
+        with open(f'{filename}.html', 'w', encoding='utf-8') as f:
             f.write(full_html)
-        logging.info(f"HTML content saved to {filename}")
+        logging.info(f"HTML content saved to {filename}.html")
     except IOError as e:
         logging.error(f"Error saving HTML content: {e}")
         raise
 
-def create_index_page(pages):
-    index_content = "<h1>Index of Notion Pages</h1><ul>"
-    for page in pages:
-        index_content += f"<li><a href='/{page['path']}'>{page['title']}</a> (Last edited: {page['last_edited_time']})</li>"
-    index_content += "</ul>"
-    
-    with open(os.path.join(CLOUDFLARE_PAGES_DIR, 'index.html'), 'w', encoding='utf-8') as f:
-        f.write(index_content)
-
 def main():
-    pages = []
-    files_count = 0
+    try:
+        logging.info("Starting Notion pages sync...")
 
-    for page_id in NOTION_PAGE_IDS:
-        try:
-            title, created_time, last_edited_time = get_notion_page_info(page_id)
-            sanitized_title = sanitize_title(title)
-            
-            cache_file = f"{CLOUDFLARE_PAGES_DIR}/cache/{page_id}.json"
-            if os.path.exists(cache_file):
-                with open(cache_file, 'r') as f:
-                    cache = json.load(f)
-                if cache['last_edited_time'] == last_edited_time:
-                    logging.info(f"Page '{title}' hasn't changed. Skipping.")
-                    pages.append(cache)
-                    continue
-
+        pages_data = []
+        for idx, page_id in enumerate(NOTION_PAGE_IDS):
+            logging.info(f"Processing page {page_id}")
             notion_content = get_notion_content(page_id)
             html_content = convert_to_html(notion_content)
+            title = get_title(page_id)
             toc = generate_toc(notion_content)
-            
-            year_month = datetime.now().strftime("%Y/%m")
-            page_path = f"{year_month}/{sanitized_title}/index.html"
-            full_path = os.path.join(CLOUDFLARE_PAGES_DIR, page_path)
-            
-            page_info = {
-                "title": title,
-                "path": page_path,
-                "created_time": created_time,
-                "last_edited_time": last_edited_time
-            }
-            pages.append(page_info)
 
-            save_html(toc, html_content, title, full_path, created_time, last_edited_time, pages)
+            filename = f'page_{idx + 1}'
+            pages_data.append((title, filename))  # Store title and filename for navigation
+            save_html(toc, html_content, title, filename, '')  # Temporarily leave navigation empty
 
-            os.makedirs(os.path.dirname(cache_file), exist_ok=True)
-            with open(cache_file, 'w') as f:
-                json.dump(page_info, f)
+        # After all pages are processed, generate navigation and save each page again
+        navigation = generate_navigation(pages_data)
 
-            files_count += 1
-            logging.info(f"Page '{title}' processed successfully")
-        except Exception as e:
-            logging.error(f"Error processing page {page_id}: {e}")
-    
-    create_index_page(pages)
-    logging.info(f"Index page created. Total files generated: {files_count + 1}")
+        for title, filename in pages_data:
+            # Re-save each page with navigation inserted
+            notion_content = get_notion_content(NOTION_PAGE_IDS[pages_data.index((title, filename))])
+            html_content = convert_to_html(notion_content)
+            toc = generate_toc(notion_content)
+            save_html(toc, html_content, title, filename, navigation)
+
+        logging.info("Sync completed successfully")
+    except Exception as e:
+        logging.error(f"Sync failed: {e}")
+        raise
 
 if __name__ == "__main__":
     main()
