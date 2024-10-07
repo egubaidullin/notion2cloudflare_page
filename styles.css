@@ -1,14 +1,14 @@
-/* Root variables for easy theme switching */
+/* Root variables for colors and spacing */
 :root {
     --bg-color: #ffffff;
     --text-color: #333333;
-    --accent-color: #4a90e2;
-    --secondary-bg: #f7f7f7;
-    --border-radius: 12px;
+    --accent-color: #2b78e4;
+    --secondary-bg: #f0f0f0;
+    --border-radius: 8px;
     --font-size-base: 16px;
-    --font-size-h1: 2.5rem;
-    --font-size-h2: 2rem;
-    --font-size-h3: 1.5rem;
+    --font-size-h1: 1.8rem;
+    --font-size-h2: 1.5rem;
+    --font-size-h3: 1.25rem;
     --line-height: 1.6;
     --toc-width: 250px;
 }
@@ -18,41 +18,22 @@
     --bg-color: #1a1a1a;
     --text-color: #e0e0e0;
     --secondary-bg: #2a2a2a;
+    --accent-color: #4a90e2;
 }
 
-/* Base styles */
+/* Global styles */
 body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-    line-height: var(--line-height);
-    color: var(--text-color);
+    font-family: 'Inter', sans-serif;
     background-color: var(--bg-color);
+    color: var(--text-color);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height);
     margin: 0;
     padding: 0;
-    font-size: var(--font-size-base);
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Main content area */
-.content {
-    padding-top: 80px; /* Space for fixed header */
-    margin-left: calc(var(--toc-width) + 20px);
-    max-width: calc(100% - var(--toc-width) - 40px);
-    padding: 40px 20px;
-}
-
-/* Headings */
-h1, h2, h3 {
-    margin-top: 1em;
-    margin-bottom: 0.5em;
-    font-weight: 600;
-    line-height: 1.2;
-}
-
-h1 { font-size: var(--font-size-h1); }
-h2 { font-size: var(--font-size-h2); }
-h3 { font-size: var(--font-size-h3); }
-
-/* Fixed header (Pages Navigation) */
+/* Header */
 .fixed-header {
     position: fixed;
     top: 0;
@@ -61,41 +42,60 @@ h3 { font-size: var(--font-size-h3); }
     background-color: var(--bg-color);
     z-index: 1000;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    border-bottom: 1px solid #ddd;
-    padding: 10px 0;
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    font-size: 0.9rem;
+    border-bottom: 1px solid var(--accent-color);
 }
 
 .pages-navigation ul {
     display: flex;
-    justify-content: space-around;
+    gap: 10px;
     list-style: none;
     margin: 0;
-    padding: 1em 0;
+    padding: 0;
 }
 
-/* Table of Contents (TOC) */
+.pages-navigation a {
+    color: var(--text-color);
+    text-decoration: none;
+    padding: 5px;
+    transition: color 0.3s;
+}
+
+.pages-navigation a:hover {
+    color: var(--accent-color);
+}
+
+.pages-navigation .separator {
+    color: var(--accent-color);
+}
+
+/* TOC */
 .toc {
     position: fixed;
-    top: 80px; /* Space below the fixed header */
+    top: 60px;
     left: 0;
     width: var(--toc-width);
-    height: calc(100vh - 80px); /* Height minus header */
+    height: calc(100vh - 60px);
     overflow-y: auto;
+    background-color: var(--secondary-bg);
     padding: 20px;
-    background-color: var(--bg-color);
     box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
 }
 
 .toc a {
-    text-decoration: none;
     color: var(--text-color);
-    transition: color 0.3s ease;
+    text-decoration: none;
     display: block;
-    padding: 5px 0;
-    font-size: 0.9em;
+    margin: 5px 0;
+    font-size: 0.95rem;
+    transition: color 0.3s;
 }
 
-.toc a:hover, .toc a.active {
+.toc a.active,
+.toc a:hover {
     color: var(--accent-color);
 }
 
@@ -109,23 +109,28 @@ h3 { font-size: var(--font-size-h3); }
     margin-left: 15px;
 }
 
-/* Scroll to Top Button */
+/* Main content */
+.content {
+    padding: 80px 20px;
+    margin-left: calc(var(--toc-width) + 20px);
+    max-width: calc(100% - var(--toc-width) - 40px);
+}
+
+/* Scroll to top button */
 #scrollToTopButton {
     position: fixed;
     bottom: 20px;
     right: 20px;
+    width: 40px;
+    height: 40px;
     background-color: var(--accent-color);
     color: white;
-    border: none;
     border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    font-size: 24px;
     display: flex;
-    align-items: center;
     justify-content: center;
+    align-items: center;
     cursor: pointer;
-    transition: opacity 0.3s ease, transform 0.3s ease;
+    transition: transform 0.3s ease, opacity 0.3s ease;
     opacity: 0;
     transform: translateY(100px);
 }
@@ -135,93 +140,26 @@ h3 { font-size: var(--font-size-h3); }
     transform: translateY(0);
 }
 
-#scrollToTopButton:hover {
-    transform: translateY(-5px);
-}
-
-/* Theme Switch */
-.theme-switch-wrapper {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 1000;
-}
-
-.theme-switch {
-    display: inline-block;
-    height: 34px;
-    position: relative;
-    width: 60px;
-}
-
-.theme-switch input {
-    display: none;
-}
-
-.slider {
-    background-color: #ccc;
-    bottom: 0;
-    cursor: pointer;
-    left: 0;
-    position: absolute;
-    right: 0;
-    top: 0;
-    transition: .4s;
-    border-radius: 34px;
-}
-
-.slider:before {
-    background-color: #fff;
-    bottom: 4px;
-    content: "";
-    height: 26px;
-    left: 4px;
-    position: absolute;
-    transition: .4s;
-    width: 26px;
-    border-radius: 50%;
-}
-
-input:checked + .slider {
-    background-color: var(--accent-color);
-}
-
-input:checked + .slider:before {
-    transform: translateX(26px);
-}
-
-/* Responsive adjustments for mobile */
+/* Responsive styles */
 @media (max-width: 768px) {
-    .fixed-header {
-        padding: 10px 0; /* Reduce padding on mobile */
-    }
-
-    .pages-navigation ul {
-        flex-direction: column;
-        padding: 0;
+    :root {
+        --toc-width: 100%;
     }
 
     .toc {
-        position: static; /* Not fixed on mobile */
+        position: static;
         width: 100%;
-        max-height: none;
-        margin-bottom: 20px;
-        padding: 10px;
+        max-height: 200px;
+        overflow-y: auto;
         border-bottom: 1px solid var(--accent-color);
     }
 
     .content {
-        padding-top: 100px; /* Space for the header */
         margin-left: 0;
-        max-width: 100%;
-        padding: 20px;
+        padding-top: 100px; /* Space for header */
     }
 
-    #scrollToTopButton {
-        bottom: 10px;
-        right: 10px;
-        width: 40px;
-        height: 40px;
-        font-size: 20px;
+    .fixed-header {
+        font-size: 0.8rem;
     }
 }
