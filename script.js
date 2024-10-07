@@ -3,10 +3,10 @@ const toggleSwitch = document.querySelector('.theme-switch input[type="checkbox"
 
 function switchTheme(e) {
     if (e.target.checked) {
-        document.documentElement.setAttribute('data-theme', 'dark');
+        document.body.classList.add('dark-theme');
         localStorage.setItem('theme', 'dark');
     } else {
-        document.documentElement.setAttribute('data-theme', 'light');
+        document.body.classList.remove('dark-theme');
         localStorage.setItem('theme', 'light');
     }    
 }
@@ -17,10 +17,9 @@ toggleSwitch.addEventListener('change', switchTheme, false);
 const currentTheme = localStorage.getItem('theme') ? localStorage.getItem('theme') : null;
 
 if (currentTheme) {
-    document.documentElement.setAttribute('data-theme', currentTheme);
-
     if (currentTheme === 'dark') {
         toggleSwitch.checked = true;
+        document.body.classList.add('dark-theme');
     }
 }
 
@@ -41,12 +40,17 @@ scrollToTopBtn.addEventListener("click", function() {
     window.scrollTo({top: 0, behavior: 'smooth'});
 });
 
-// Sidebar toggle for mobile
-const toggleSidebarBtn = document.querySelector('.toggle-sidebar');
+// TOC toggle
+const toggleTocBtn = document.querySelector('.toggle-toc');
 const sidebar = document.querySelector('.sidebar');
 
-toggleSidebarBtn.addEventListener('click', () => {
-    sidebar.classList.toggle('active');
+toggleTocBtn.addEventListener('click', () => {
+    sidebar.classList.toggle('hidden');
+    if (sidebar.classList.contains('hidden')) {
+        toggleTocBtn.textContent = 'Show TOC';
+    } else {
+        toggleTocBtn.textContent = 'Hide TOC';
+    }
 });
 
 // Add copy buttons to code blocks
