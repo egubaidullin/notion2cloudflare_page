@@ -1,0 +1,280 @@
+/* Root variables for easy theme switching */
+:root {
+    --bg-color: #ffffff;
+    --text-color: #333333;
+    --accent-color: #4a90e2;
+    --secondary-bg: #f7f7f7;
+    --border-radius: 12px;
+    --font-size-base: 16px;
+    --font-size-h1: 2.5rem;
+    --font-size-h2: 2rem;
+    --font-size-h3: 1.5rem;
+    --line-height: 1.6;
+    --toc-width: 250px;
+}
+
+/* Dark theme variables */
+:root.dark-theme {
+    --bg-color: #1a1a1a;
+    --text-color: #e0e0e0;
+    --secondary-bg: #2a2a2a;
+}
+
+/* Base styles */
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+    line-height: var(--line-height);
+    color: var(--text-color);
+    background-color: var(--bg-color);
+    margin: 0;
+    padding: 0;
+    font-size: var(--font-size-base);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Main content area */
+.content {
+    max-width: calc(100% - var(--toc-width) - 40px);
+    margin-left: calc(var(--toc-width) + 20px);
+    padding: 40px 20px;
+}
+
+/* Headings */
+h1, h2, h3 {
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+h1 { font-size: var(--font-size-h1); }
+h2 { font-size: var(--font-size-h2); }
+h3 { font-size: var(--font-size-h3); }
+
+/* Code blocks */
+pre {
+    background-color: var(--secondary-bg);
+    padding: 20px;
+    border-radius: var(--border-radius);
+    overflow-x: auto;
+    font-size: 0.9em;
+}
+
+code {
+    font-family: 'Fira Code', 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+}
+
+/* Callout boxes */
+.callout {
+    background-color: var(--secondary-bg);
+    padding: 20px;
+    border-radius: var(--border-radius);
+    margin-bottom: 20px;
+    border-left: 4px solid var(--accent-color);
+}
+
+/* Images */
+img {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--border-radius);
+}
+
+/* Table of Contents */
+.toc {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: var(--toc-width);
+    height: 100vh;
+    overflow-y: auto;
+    background-color: var(--bg-color);
+    padding: 20px;
+    box-shadow: 2px 0 4px rgba(0,0,0,0.1);
+}
+
+.toc a {
+    text-decoration: none;
+    color: var(--text-color);
+    transition: color 0.3s ease;
+    display: block;
+    padding: 5px 0;
+    font-size: 0.9em;
+}
+
+.toc a:hover, .toc a.active {
+    color: var(--accent-color);
+}
+
+.toc ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.toc ul ul {
+    margin-left: 15px;
+}
+
+/* Scroll to Top Button */
+#scrollToTopButton {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    opacity: 0;
+    transform: translateY(100px);
+}
+
+#scrollToTopButton.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+#scrollToTopButton:hover {
+    transform: translateY(-5px);
+}
+
+/* Theme Switch */
+.theme-switch-wrapper {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+}
+
+.theme-switch {
+    display: inline-block;
+    height: 34px;
+    position: relative;
+    width: 60px;
+}
+
+.theme-switch input {
+    display: none;
+}
+
+.slider {
+    background-color: #ccc;
+    bottom: 0;
+    cursor: pointer;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    background-color: #fff;
+    bottom: 4px;
+    content: "";
+    height: 26px;
+    left: 4px;
+    position: absolute;
+    transition: .4s;
+    width: 26px;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: var(--accent-color);
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+/* Blockquotes */
+blockquote {
+    border-left: 4px solid var(--accent-color);
+    margin: 0;
+    padding-left: 20px;
+    font-style: italic;
+    color: #666;
+}
+
+/* Copy button styles */
+.code-wrapper {
+    position: relative;
+}
+
+.copy-button {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background-color: transparent;
+    color: var(--text-color);
+    border: none;
+    width: 30px;
+    height: 30px;
+    font-size: 16px;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.copy-button:hover {
+    opacity: 1;
+}
+
+/* Copy feedback styles */
+.copy-feedback {
+    position: absolute;
+    top: 5px;
+    right: 40px;
+    background-color: var(--text-color);
+    color: var(--bg-color);
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.copy-feedback.show {
+    opacity: 1;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    :root {
+        --toc-width: 100%;
+    }
+
+    .toc {
+        position: static;
+        width: auto;
+        height: auto;
+        max-height: 300px;
+        margin-bottom: 20px;
+        box-shadow: none;
+        border-bottom: 1px solid var(--accent-color);
+    }
+
+    .content {
+        max-width: 100%;
+        margin-left: 0;
+        padding: 20px;
+    }
+
+    .theme-switch-wrapper {
+        position: static;
+        margin-bottom: 20px;
+    }
+}
