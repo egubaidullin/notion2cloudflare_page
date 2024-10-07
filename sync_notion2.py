@@ -14,7 +14,6 @@ if NOTION_PAGE_IDS is None:
     raise ValueError("The 'NOTION_PAGE_IDS' environment variable is required but is not set.")
 else:
     logging.info(f"NOTION_PAGE_IDS: {NOTION_PAGE_IDS}")
-    NOTION_PAGE_IDS = NOTION_PAGE_IDS.split(",")
 
 # Check if NOTION_API_TOKEN is set
 if NOTION_API_TOKEN is None:
@@ -172,7 +171,7 @@ def main():
         logging.info("Starting Notion pages sync...")
 
         pages_data = []
-        for idx, page_id in enumerate(NOTION_PAGE_IDS):
+        for idx, page_id in enumerate(E_IDS):
             logging.info(f"Processing page {page_id}")
             notion_content = get_notion_content(page_id)
             html_content = convert_to_html(notion_content)
