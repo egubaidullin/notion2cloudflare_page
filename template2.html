@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .menu {
+            background-color: #f4f4f4;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+        .menu ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .menu li {
+            display: inline;
+            margin-right: 10px;
+        }
+        .toc {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+        .metadata {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="menu">
+        {{ menu }}
+    </nav>
+    <h1>{{ title }}</h1>
+    <div class="metadata">
+        <p>Created: {{ created_time }}</p>
+        <p>Last edited: {{ last_edited_time }}</p>
+    </div>
+    <div class="toc">
+        <h2>Table of Contents</h2>
+        {{ toc }}
+    </div>
+    <div class="content">
+        {{ content }}
+    </div>
+</body>
+</html>
