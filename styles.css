@@ -48,6 +48,7 @@ body.dark-theme {
 
 header {
     background-color: var(--primary-color);
+    transition: background-color 0.3s ease;
     padding: 1rem 0;
     color: white;
     position: fixed;
@@ -287,8 +288,8 @@ pre {
         height: 100vh;
         transform: translateX(-100%);
         top: 0;
+        transition: transform 0.3s ease-in-out; /* Smooth transitions */
     }
-
     .sidebar.hidden {
         transform: translateX(-100%);
     }
