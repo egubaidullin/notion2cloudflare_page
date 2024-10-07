@@ -4,18 +4,21 @@
     --primary-color-light: #3498db;
     --secondary-color-light: #2ecc71;
     --sidebar-bg-light: #f4f4f4;
+    --code-bg-light: #f8f8f8;
 
     --bg-color-dark: #1a1a1a;
     --text-color-dark: #ffffff;
     --primary-color-dark: #3498db;
     --secondary-color-dark: #2ecc71;
     --sidebar-bg-dark: #2c2c2c;
+    --code-bg-dark: #2a2a2a;
 
     --bg-color: var(--bg-color-light);
     --text-color: var(--text-color-light);
     --primary-color: var(--primary-color-light);
     --secondary-color: var(--secondary-color-light);
     --sidebar-bg: var(--sidebar-bg-light);
+    --code-bg: var(--code-bg-light);
 }
 
 body {
@@ -34,6 +37,7 @@ body.dark-theme {
     --primary-color: var(--primary-color-dark);
     --secondary-color: var(--secondary-color-dark);
     --sidebar-bg: var(--sidebar-bg-dark);
+    --code-bg: var(--code-bg-dark);
 }
 
 .container {
@@ -59,19 +63,31 @@ header {
 }
 
 .pages-navigation {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
     display: flex;
-}
-
-.pages-navigation li {
-    margin-right: 1rem;
 }
 
 .pages-navigation a {
     color: white;
     text-decoration: none;
+    margin-right: 0.5rem;
+}
+
+.pages-navigation a:not(:last-child)::after {
+    content: '|';
+    margin-left: 0.5rem;
+}
+
+.controls {
+    display: flex;
+    align-items: center;
+}
+
+.toggle-toc {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    margin-right: 1rem;
 }
 
 .theme-switch-wrapper {
@@ -150,7 +166,7 @@ input:checked + .slider:before {
 
 .toc-content {
     overflow-y: auto;
-    max-height: calc(100% - 40px);
+    max-height: 100%;
 }
 
 .sidebar h3 {
@@ -183,21 +199,8 @@ input:checked + .slider:before {
     overflow-wrap: break-word;
 }
 
-.toggle-toc {
-    display: block;
-    width: 100%;
-    background: none;
-    border: none;
-    font-size: 1rem;
-    color: var(--text-color);
-    cursor: pointer;
-    padding: 0.5rem;
-    margin-bottom: 1rem;
-    text-align: left;
-}
-
 pre {
-    background-color: var(--sidebar-bg);
+    background-color: var(--code-bg);
     padding: 1rem;
     border-radius: 4px;
     position: relative;
@@ -264,7 +267,7 @@ pre {
         margin-bottom: 1rem;
     }
 
-    .theme-switch-wrapper {
+    .controls {
         align-self: flex-end;
     }
 }
