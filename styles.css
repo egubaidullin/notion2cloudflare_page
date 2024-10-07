@@ -5,7 +5,6 @@
     --secondary-color-light: #2ecc71;
     --sidebar-bg-light: #f4f4f4;
     --code-bg-light: #f8f8f8;
-    --header-light: #f0f4f8;
 
     --bg-color-dark: #1a1a1a;
     --text-color-dark: #ffffff;
@@ -13,7 +12,6 @@
     --secondary-color-dark: #2ecc71;
     --sidebar-bg-dark: #2c2c2c;
     --code-bg-dark: #2a2a2a;
-    --header-dark: #1a1a2e;
 
     --bg-color: var(--bg-color-light);
     --text-color: var(--text-color-light);
@@ -21,7 +19,6 @@
     --secondary-color: var(--secondary-color-light);
     --sidebar-bg: var(--sidebar-bg-light);
     --code-bg: var(--code-bg-light);
-    --header-bg: var(--header-light);
 }
 
 body {
@@ -41,7 +38,6 @@ body.dark-theme {
     --secondary-color: var(--secondary-color-dark);
     --sidebar-bg: var(--sidebar-bg-dark);
     --code-bg: var(--code-bg-dark);
-    --header-bg: var(--header-dark);
 }
 
 .container {
@@ -51,14 +47,13 @@ body.dark-theme {
 }
 
 header {
-    background-color: var(--header-bg);
+    background-color: var(--primary-color);
     padding: 1rem 0;
     color: white;
     position: fixed;
     width: 100%;
     top: 0;
     z-index: 1000;
-    transition: background-color 0.3s;
 }
 
 .top-nav {
@@ -69,7 +64,8 @@ header {
 
 .pages-navigation {
     display: flex;
-    gap: 0.5rem;
+    justify-content: space-between;
+    gap: 15px;
 }
 
 .pages-navigation a {
@@ -77,13 +73,9 @@ header {
     text-decoration: none;
 }
 
-.pages-navigation a::after {
+.pages-navigation a:not(:last-child)::after {
     content: '|';
     margin-left: 0.5rem;
-}
-
-.pages-navigation a:last-child::after {
-    content: '';
 }
 
 .controls {
@@ -102,13 +94,11 @@ header {
 .theme-switch-wrapper {
     display: flex;
     align-items: center;
-    font-size: 1.5rem;
-    cursor: pointer;
 }
 
 .main-content {
     display: flex;
-    margin-top: 80px; /* Adjusted margin */
+    margin-top: 70px;
 }
 
 .sidebar {
@@ -116,51 +106,20 @@ header {
     background-color: var(--sidebar-bg);
     padding: 1rem;
     position: fixed;
-    top: 80px; /* Adjusted to avoid overlap */
-    height: calc(100vh - 80px);
+    height: calc(100vh - 70px);
     overflow-y: auto;
     transition: transform 0.3s ease-in-out;
+    left: 0;
 }
 
 .sidebar.hidden {
     transform: translateX(-250px);
 }
 
-.toc-content {
-    overflow-y: auto;
-    max-height: 100%;
-}
-
-.sidebar ul {
-    list-style-type: none;
-    padding: 0;
-}
-
-.sidebar a {
-    color: var(--text-color);
-    text-decoration: none;
-}
-
-.sidebar a:hover {
-    color: var(--primary-color);
-}
-
 .content {
     flex: 1;
     margin-left: 270px;
     padding: 1rem;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-}
-
-pre {
-    background-color: var(--code-bg);
-    padding: 1rem;
-    border-radius: 4px;
-    position: relative;
-    overflow-x: auto;
-    white-space: pre-wrap;
-    word-wrap: break-word;
 }
 
 #scrollToTopBtn {
@@ -186,9 +145,10 @@ pre {
 
 @media (max-width: 768px) {
     .sidebar {
-        width: 100%; /* Full width on mobile */
+        width: 100%;
         height: auto;
         position: relative;
+        transform: translateX(0);
     }
 
     .sidebar.hidden {
