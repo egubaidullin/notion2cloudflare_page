@@ -20,8 +20,6 @@ if NOTION_API_TOKEN is None:
     logging.error("Environment variable 'NOTION_API_TOKEN' is not set.")
     raise ValueError("The 'NOTION_API_TOKEN' environment variable is required but is not set.")
 
-
-
 headers = {
     "Authorization": f"Bearer {NOTION_API_TOKEN}",
     "Notion-Version": "2022-06-28"
@@ -54,6 +52,9 @@ def get_notion_content(page_id):
             raise
 
     return all_blocks
+
+def get_text_content(rich_text):
+    return ''.join([t['plain_text'] for t in rich_text])
 
 def convert_to_html(blocks):
     html_content = []
@@ -115,16 +116,6 @@ def get_child_blocks(block_id):
     response.raise_for_status()
     return response.json()['results']
 
-def get_text_content(rich_text):
-    return ''.join([t['plain_text'] for t in rich_text])def get_child_blocks(block_id):
-    url = f"https://api.notion.com/v1/blocks/{block_id}/children"
-    response = requests.get(url, headers=headers)
-    response.raise_for_status()
-    return response.json()['results']
-
-def get_text_content(rich_text):
-    return ''.join([t['plain_text'] for t in rich_text])
-
 def get_title(page_id):
     try:
         url = f"https://api.notion.com/v1/pages/{page_id}"
@@ -132,13 +123,14 @@ def get_title(page_id):
         response.raise_for_status()
         page_data = response.json()
 
+        # Получаем заголовок страницы из свойства title
         title_property = page_data.get("properties", {}).get("title", {}).get("title", [])
         if title_property:
             return title_property[0]["text"]["content"]
 
         logging.warning("Page title not found.")
         return "Your Page Title from Notion"
-    
+
     except requests.RequestException as e:
         logging.error(f"Error fetching page title: {e}")
         raise
