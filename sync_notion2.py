@@ -8,6 +8,14 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 NOTION_API_TOKEN = os.getenv('NOTION_API_TOKEN')
 NOTION_PAGE_IDS = os.getenv('NOTION_PAGE_IDS').split(",")
 
+# Check if NOTION_PAGE_IDS is set and not None
+if NOTION_PAGE_IDS:
+    NOTION_PAGE_IDS = NOTION_PAGE_IDS.split(",")
+else:
+    logging.error("Environment variable 'NOTION_PAGE_IDS' is not set or is empty.")
+    raise ValueError("The 'NOTION_PAGE_IDS' environment variable is required but is not set.")
+
+
 headers = {
     "Authorization": f"Bearer {NOTION_API_TOKEN}",
     "Notion-Version": "2022-06-28"
