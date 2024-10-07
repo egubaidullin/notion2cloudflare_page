@@ -45,6 +45,9 @@ scrollToTopBtn.addEventListener("click", function() {
 // TOC toggle
 const toggleTocBtn = document.querySelector('.toggle-toc');
 const sidebar = document.querySelector('.sidebar');
+const content = document.querySelector('.content');
+
+// For mobile overlay
 const overlay = document.createElement('div');
 overlay.classList.add('overlay');
 document.body.appendChild(overlay);
@@ -55,9 +58,17 @@ toggleTocBtn.addEventListener('click', () => {
     overlay.classList.toggle('active');
 
     if (window.innerWidth <= 768) {
-        toggleTocBtn.innerHTML = sidebar.classList.contains('active') 
-            ? '<i class="fas fa-times"></i>' 
-            : '<i class="fas fa-bars"></i>';
+        if (sidebar.classList.contains('active')) {
+            toggleTocBtn.innerHTML = '<i class="fas fa-times"></i>';
+        } else {
+            toggleTocBtn.innerHTML = '<i class="fas fa-bars"></i>';
+        }
+    } else {
+        if (sidebar.classList.contains('hidden')) {
+            toggleTocBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
+        } else {
+            toggleTocBtn.innerHTML = '<i class="fas fa-bars"></i>';
+        }
     }
 });
 
