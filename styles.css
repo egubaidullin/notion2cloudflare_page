@@ -46,6 +46,32 @@ header {
     background-color: var(--primary-color);
     padding: 1rem 0;
     color: white;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1000;
+}
+
+.top-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.pages-navigation {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+}
+
+.pages-navigation li {
+    margin-right: 1rem;
+}
+
+.pages-navigation a {
+    color: white;
+    text-decoration: none;
 }
 
 .theme-switch-wrapper {
@@ -104,7 +130,7 @@ input:checked + .slider:before {
 
 .main-content {
     display: flex;
-    margin-top: 2rem;
+    margin-top: 70px;
 }
 
 .sidebar {
@@ -112,9 +138,19 @@ input:checked + .slider:before {
     background-color: var(--sidebar-bg);
     padding: 1rem;
     position: fixed;
-    height: calc(100vh - 60px);
+    height: calc(100vh - 70px);
     overflow-y: auto;
     transition: transform 0.3s ease-in-out;
+    left: 0;
+}
+
+.sidebar.hidden {
+    transform: translateX(-250px);
+}
+
+.toc-content {
+    overflow-y: auto;
+    max-height: calc(100% - 40px);
 }
 
 .sidebar h3 {
@@ -143,15 +179,21 @@ input:checked + .slider:before {
     flex: 1;
     margin-left: 270px;
     padding: 1rem;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
-.toggle-sidebar {
-    display: none;
+.toggle-toc {
+    display: block;
+    width: 100%;
     background: none;
     border: none;
-    font-size: 1.5rem;
+    font-size: 1rem;
     color: var(--text-color);
     cursor: pointer;
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+    text-align: left;
 }
 
 pre {
@@ -160,6 +202,8 @@ pre {
     border-radius: 4px;
     position: relative;
     overflow-x: auto;
+    white-space: pre-wrap;
+    word-wrap: break-word;
 }
 
 .copy-btn {
@@ -197,23 +241,30 @@ pre {
 
 @media (max-width: 768px) {
     .sidebar {
-        transform: translateX(-100%);
-        z-index: 1000;
-    }
-
-    .sidebar.active {
+        width: 100%;
+        height: auto;
+        position: relative;
         transform: translateX(0);
     }
 
-    .toggle-sidebar {
-        display: block;
-        position: fixed;
-        top: 70px;
-        left: 10px;
-        z-index: 1001;
+    .sidebar.hidden {
+        display: none;
     }
 
     .content {
         margin-left: 0;
+    }
+
+    .top-nav {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .pages-navigation {
+        margin-bottom: 1rem;
+    }
+
+    .theme-switch-wrapper {
+        align-self: flex-end;
     }
 }
