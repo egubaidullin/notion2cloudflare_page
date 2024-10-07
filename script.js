@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const checkbox = document.getElementById('checkbox');
     const toc = document.querySelector('.toc');
     const tocLinks = toc.getElementsByTagName('a');
+    const toggleTocButton = document.querySelector('.toggle-toc');
 
     // Theme Switch functionality
     function setTheme(theme) {
@@ -119,5 +120,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.error('Failed to copy: ', err);
             });
         });
+    });
+
+    // Toggle TOC visibility
+    toggleTocButton.addEventListener('click', () => {
+        toc.classList.toggle('collapsed');
+        if (toc.classList.contains('collapsed')) {
+            toc.style.maxHeight = '0';
+            toc.style.transition = 'max-height 0.3s ease-out';
+        } else {
+            toc.style.maxHeight = '400px'; // Set this to the desired max height
+            toc.style.transition = 'max-height 0.5s ease-in';
+        }
     });
 });
