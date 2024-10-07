@@ -1,5 +1,7 @@
 // Theme switcher
 const toggleSwitch = document.querySelector('.theme-switch input[type="checkbox"]');
+const sunIcon = document.querySelector('.sun-icon');
+const moonIcon = document.querySelector('.moon-icon');
 
 function switchTheme(e) {
     if (e.target.checked) {
@@ -45,13 +47,37 @@ const toggleTocBtn = document.querySelector('.toggle-toc');
 const sidebar = document.querySelector('.sidebar');
 const content = document.querySelector('.content');
 
+// For mobile overlay
+const overlay = document.createElement('div');
+overlay.classList.add('overlay');
+document.body.appendChild(overlay);
+
 toggleTocBtn.addEventListener('click', () => {
     sidebar.classList.toggle('hidden');
-    if (sidebar.classList.contains('hidden')) {
-        toggleTocBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
+    sidebar.classList.toggle('active');
+    overlay.classList.toggle('active');
+
+    if (window.innerWidth <= 768) {
+        if (sidebar.classList.contains('active')) {
+            toggleTocBtn.innerHTML = '<i class="fas fa-times"></i>';
+        } else {
+            toggleTocBtn.innerHTML = '<i class="fas fa-bars"></i>';
+        }
     } else {
-        toggleTocBtn.innerHTML = '<i class="fas fa-bars"></i>';
+        if (sidebar.classList.contains('hidden')) {
+            toggleTocBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
+        } else {
+            toggleTocBtn.innerHTML = '<i class="fas fa-bars"></i>';
+        }
     }
+});
+
+// Close TOC when clicking on overlay
+overlay.addEventListener('click', () => {
+    sidebar.classList.add('hidden');
+    sidebar.classList.remove('active');
+    overlay.classList.remove('active');
+    toggleTocBtn.innerHTML = '<i class="fas fa-bars"></i>';
 });
 
 // Add copy buttons to code blocks
@@ -83,6 +109,14 @@ document.querySelectorAll('.toc a').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
         e.preventDefault();
         
+        // Close TOC on mobile after clicking
+        if (window.innerWidth <= 768) {
+            sidebar.classList.add('hidden');
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
+            toggleTocBtn.innerHTML = '<i class="fas fa-bars"></i>';
+        }
+
         document.querySelector(this.getAttribute('href')).scrollIntoView({
             behavior: 'smooth'
         });
