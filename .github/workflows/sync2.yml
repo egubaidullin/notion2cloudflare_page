@@ -27,7 +27,7 @@ jobs:
         env:
           NOTION_API_TOKEN: ${{ secrets.NOTION_API_TOKEN }}
           NOTION_PAGE_IDS: ${{ secrets.NOTION_PAGE_IDS }}
-        run: python sync_notion.py
+        run: python sync_notion2.py
 
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/pages-action@v1
