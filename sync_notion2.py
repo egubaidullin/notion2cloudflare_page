@@ -8,17 +8,19 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 NOTION_API_TOKEN = os.getenv('NOTION_API_TOKEN')
 NOTION_PAGE_IDS = os.getenv('NOTION_PAGE_IDS').split(",")
 
-# Check if both NOTION_API_TOKEN and NOTION_PAGE_IDS are set and not None
+# Add logging to check if NOTION_PAGE_IDS is set
+if NOTION_PAGE_IDS is None:
+    logging.error("Environment variable 'NOTION_PAGE_IDS' is not set or is None.")
+    raise ValueError("The 'NOTION_PAGE_IDS' environment variable is required but is not set.")
+else:
+    logging.info(f"NOTION_PAGE_IDS: {NOTION_PAGE_IDS}")
+    NOTION_PAGE_IDS = NOTION_PAGE_IDS.split(",")
+
+# Check if NOTION_API_TOKEN is set
 if NOTION_API_TOKEN is None:
     logging.error("Environment variable 'NOTION_API_TOKEN' is not set.")
     raise ValueError("The 'NOTION_API_TOKEN' environment variable is required but is not set.")
 
-if NOTION_PAGE_IDS is None:
-    logging.error("Environment variable 'NOTION_PAGE_IDS' is not set.")
-    raise ValueError("The 'NOTION_PAGE_IDS' environment variable is required but is not set.")
-else:
-    # Split the NOTION_PAGE_IDS string into a list of page IDs
-    NOTION_PAGE_IDS = NOTION_PAGE_IDS.split(",")
 
 
 headers = {
