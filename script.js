@@ -144,15 +144,3 @@ const observer = new IntersectionObserver(entries => {
 document.querySelectorAll('h2[id], h3[id], h4[id], h5[id], h6[id]').forEach((section) => {
     observer.observe(section);
 });
-
-// Theme toggle button
-const themeToggleBtn = document.getElementById('theme-toggle');
-
-function toggleTheme() {
-    document.body.classList.toggle('dark-theme');
-    const icon = themeToggleBtn.querySelector('i');
-    icon.classList.toggle('fa-moon');
-    icon.classList.toggle('fa-sun');
-}
-
-themeToggleBtn.addEventListener('click', toggleTheme);
