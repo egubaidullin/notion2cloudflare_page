@@ -109,6 +109,22 @@ def convert_to_html(blocks):
 
     return ''.join(html_content)  # Join the list into a single string
 
+def get_child_blocks(block_id):
+    url = f"https://api.notion.com/v1/blocks/{block_id}/children"
+    response = requests.get(url, headers=headers)
+    response.raise_for_status()
+    return response.json()['results']
+
+def get_text_content(rich_text):
+    return ''.join([t['plain_text'] for t in rich_text])def get_child_blocks(block_id):
+    url = f"https://api.notion.com/v1/blocks/{block_id}/children"
+    response = requests.get(url, headers=headers)
+    response.raise_for_status()
+    return response.json()['results']
+
+def get_text_content(rich_text):
+    return ''.join([t['plain_text'] for t in rich_text])
+
 def get_title(page_id):
     try:
         url = f"https://api.notion.com/v1/pages/{page_id}"
