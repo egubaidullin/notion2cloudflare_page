@@ -34,8 +34,9 @@ body {
 
 /* Main content area */
 .content {
-    max-width: calc(100% - var(--toc-width) - 40px);
+    padding-top: 80px; /* Space for fixed header */
     margin-left: calc(var(--toc-width) + 20px);
+    max-width: calc(100% - var(--toc-width) - 40px);
     padding: 40px 20px;
 }
 
@@ -51,46 +52,38 @@ h1 { font-size: var(--font-size-h1); }
 h2 { font-size: var(--font-size-h2); }
 h3 { font-size: var(--font-size-h3); }
 
-/* Code blocks */
-pre {
-    background-color: var(--secondary-bg);
-    padding: 20px;
-    border-radius: var(--border-radius);
-    overflow-x: auto;
-    font-size: 0.9em;
-}
-
-code {
-    font-family: 'Fira Code', 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
-}
-
-/* Callout boxes */
-.callout {
-    background-color: var(--secondary-bg);
-    padding: 20px;
-    border-radius: var(--border-radius);
-    margin-bottom: 20px;
-    border-left: 4px solid var(--accent-color);
-}
-
-/* Images */
-img {
-    max-width: 100%;
-    height: auto;
-    border-radius: var(--border-radius);
-}
-
-/* Table of Contents */
-.toc {
+/* Fixed header (Pages Navigation) */
+.fixed-header {
     position: fixed;
     top: 0;
     left: 0;
-    width: var(--toc-width);
-    height: 100vh;
-    overflow-y: auto;
+    width: 100%;
     background-color: var(--bg-color);
+    z-index: 1000;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid #ddd;
+    padding: 10px 0;
+}
+
+.pages-navigation ul {
+    display: flex;
+    justify-content: space-around;
+    list-style: none;
+    margin: 0;
+    padding: 1em 0;
+}
+
+/* Table of Contents (TOC) */
+.toc {
+    position: fixed;
+    top: 80px; /* Space below the fixed header */
+    left: 0;
+    width: var(--toc-width);
+    height: calc(100vh - 80px); /* Height minus header */
+    overflow-y: auto;
     padding: 20px;
-    box-shadow: 2px 0 4px rgba(0,0,0,0.1);
+    background-color: var(--bg-color);
+    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
 }
 
 .toc a {
@@ -197,140 +190,38 @@ input:checked + .slider:before {
     transform: translateX(26px);
 }
 
-/* Blockquotes */
-blockquote {
-    border-left: 4px solid var(--accent-color);
-    margin: 0;
-    padding-left: 20px;
-    font-style: italic;
-    color: #666;
-}
-
-/* Copy button styles */
-.code-wrapper {
-    position: relative;
-}
-
-.copy-button {
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    background-color: transparent;
-    color: var(--text-color);
-    border: none;
-    width: 30px;
-    height: 30px;
-    font-size: 16px;
-    cursor: pointer;
-    opacity: 0.6;
-    transition: opacity 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.copy-button:hover {
-    opacity: 1;
-}
-
-/* Copy feedback styles */
-.copy-feedback {
-    position: absolute;
-    top: 5px;
-    right: 40px;
-    background-color: var(--text-color);
-    color: var(--bg-color);
-    padding: 5px 10px;
-    border-radius: 4px;
-    font-size: 12px;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.copy-feedback.show {
-    opacity: 1;
-}
-
-/* Responsive styles */
+/* Responsive adjustments for mobile */
 @media (max-width: 768px) {
-    :root {
-        --toc-width: 100%;
+    .fixed-header {
+        padding: 10px 0; /* Reduce padding on mobile */
+    }
+
+    .pages-navigation ul {
+        flex-direction: column;
+        padding: 0;
     }
 
     .toc {
-        position: static;
-        width: auto;
-        height: auto;
-        max-height: 300px;
+        position: static; /* Not fixed on mobile */
+        width: 100%;
+        max-height: none;
         margin-bottom: 20px;
-        box-shadow: none;
+        padding: 10px;
         border-bottom: 1px solid var(--accent-color);
     }
 
     .content {
-        max-width: 100%;
+        padding-top: 100px; /* Space for the header */
         margin-left: 0;
+        max-width: 100%;
         padding: 20px;
     }
 
-    .theme-switch-wrapper {
-        position: static;
-        margin-bottom: 20px;
-    }
-}
-/* Fixed header for pages navigation */
-.fixed-header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    background-color: var(--bg-color);
-    z-index: 1000;
-    border-bottom: 1px solid #ddd; /* Optional border for separation */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.pages-navigation ul {
-    display: flex;
-    justify-content: space-around;
-    list-style: none;
-    margin: 0;
-    padding: 1em 0;
-    font-size: var(--font-size-base);
-}
-
-.pages-navigation ul li {
-    margin: 0;
-}
-
-.pages-navigation ul a {
-    text-decoration: none;
-    color: var(--text-color);
-    padding: 0.5em 1em;
-    transition: color 0.3s ease;
-}
-
-.pages-navigation ul a:hover {
-    color: var(--accent-color);
-}
-
-/* Ensure content does not overlap with the fixed header */
-.content {
-    padding-top: 80px; /* Adjust based on header height */
-    max-width: calc(100% - var(--toc-width) - 40px);
-    margin-left: calc(var(--toc-width) + 20px);
-}
-
-/* Responsive adjustment */
-@media (max-width: 768px) {
-    .pages-navigation ul {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .content {
-        padding-top: 100px; /* Adjust for mobile header spacing */
-        margin-left: 0;
-        max-width: 100%;
+    #scrollToTopButton {
+        bottom: 10px;
+        right: 10px;
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
     }
 }
