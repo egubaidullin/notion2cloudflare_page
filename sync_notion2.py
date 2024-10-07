@@ -171,7 +171,7 @@ def main():
         logging.info("Starting Notion pages sync...")
 
         pages_data = []
-        for idx, page_id in enumerate(E_IDS):
+        for idx, page_id in enumerate(NOTION_PAGE_IDS):
             logging.info(f"Processing page {page_id}")
             notion_content = get_notion_content(page_id)
             html_content = convert_to_html(notion_content)
