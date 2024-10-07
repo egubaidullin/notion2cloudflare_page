@@ -1,37 +1,25 @@
-// Theme switcher with sun and moon icons
-const sunIcon = document.getElementById('sun-icon');
-const moonIcon = document.getElementById('moon-icon');
-const toggleSwitch = document.querySelector('.theme-switch-wrapper');
+// Theme switcher
+const toggleSwitch = document.querySelector('#theme-toggle');
+const themeIcon = document.querySelector('#theme-icon');
 
-function switchTheme() {
+toggleSwitch.addEventListener('click', () => {
+    document.body.classList.toggle('dark-theme');
     if (document.body.classList.contains('dark-theme')) {
-        document.body.classList.remove('dark-theme');
-        localStorage.setItem('theme', 'light');
-        moonIcon.style.display = 'block';
-        sunIcon.style.display = 'none';
-    } else {
-        document.body.classList.add('dark-theme');
+        themeIcon.classList.replace('fa-sun', 'fa-moon');
         localStorage.setItem('theme', 'dark');
-        moonIcon.style.display = 'none';
-        sunIcon.style.display = 'block';
+    } else {
+        themeIcon.classList.replace('fa-moon', 'fa-sun');
+        localStorage.setItem('theme', 'light');
     }
-}
+});
 
-toggleSwitch.addEventListener('click', switchTheme, false);
-
-// Check for saved user preference
-const currentTheme = localStorage.getItem('theme') ? localStorage.getItem('theme') : null;
-
+const currentTheme = localStorage.getItem('theme');
 if (currentTheme === 'dark') {
     document.body.classList.add('dark-theme');
-    moonIcon.style.display = 'none';
-    sunIcon.style.display = 'block';
-} else {
-    moonIcon.style.display = 'block';
-    sunIcon.style.display = 'none';
+    themeIcon.classList.replace('fa-sun', 'fa-moon');
 }
 
-// Scroll to top button functionality
+// Scroll to top button
 const scrollToTopBtn = document.getElementById("scrollToTopBtn");
 
 window.onscroll = function() {scrollFunction()};
@@ -48,11 +36,10 @@ scrollToTopBtn.addEventListener("click", function() {
     window.scrollTo({top: 0, behavior: 'smooth'});
 });
 
-// TOC toggle functionality
+// TOC toggle
 const toggleTocBtn = document.querySelector('.toggle-toc');
 const sidebar = document.querySelector('.sidebar');
 
 toggleTocBtn.addEventListener('click', () => {
     sidebar.classList.toggle('hidden');
-    toggleTocBtn.textContent = sidebar.classList.contains('hidden') ? 'Show TOC' : 'Hide TOC';
 });
