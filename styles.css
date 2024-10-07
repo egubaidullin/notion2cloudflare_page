@@ -278,3 +278,59 @@ blockquote {
         margin-bottom: 20px;
     }
 }
+/* Fixed header for pages navigation */
+.fixed-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: var(--bg-color);
+    z-index: 1000;
+    border-bottom: 1px solid #ddd; /* Optional border for separation */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.pages-navigation ul {
+    display: flex;
+    justify-content: space-around;
+    list-style: none;
+    margin: 0;
+    padding: 1em 0;
+    font-size: var(--font-size-base);
+}
+
+.pages-navigation ul li {
+    margin: 0;
+}
+
+.pages-navigation ul a {
+    text-decoration: none;
+    color: var(--text-color);
+    padding: 0.5em 1em;
+    transition: color 0.3s ease;
+}
+
+.pages-navigation ul a:hover {
+    color: var(--accent-color);
+}
+
+/* Ensure content does not overlap with the fixed header */
+.content {
+    padding-top: 80px; /* Adjust based on header height */
+    max-width: calc(100% - var(--toc-width) - 40px);
+    margin-left: calc(var(--toc-width) + 20px);
+}
+
+/* Responsive adjustment */
+@media (max-width: 768px) {
+    .pages-navigation ul {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .content {
+        padding-top: 100px; /* Adjust for mobile header spacing */
+        margin-left: 0;
+        max-width: 100%;
+    }
+}
