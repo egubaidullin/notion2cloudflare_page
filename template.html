@@ -5,22 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ title }}</title>
     <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <header>
         <div class="container">
             <nav class="top-nav">
+                <div class="controls">
+                    <button class="toggle-toc" title="Toggle TOC"><i class="fas fa-bars"></i></button>
+                </div>
                 <div class="pages-navigation">
                     {{ pages_navigation }}
                 </div>
-                <div class="controls">
-                    <button class="toggle-toc"><i class="fas fa-bars"></i></button>
-                    <div class="theme-switch-wrapper">
-                        <button id="theme-toggle">
-                            <i id="theme-icon" class="fas fa-sun"></i>
-                        </button>
-                    </div>
+                <div class="theme-switch-wrapper">
+                    <label class="theme-switch" for="checkbox">
+                        <input type="checkbox" id="checkbox" />
+                        <i class="fas fa-sun sun-icon"></i>
+                        <i class="fas fa-moon moon-icon"></i>
+                        <div class="slider round"></div>
+                    </label>
                 </div>
             </nav>
         </div>
