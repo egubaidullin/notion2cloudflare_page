@@ -187,6 +187,8 @@ def main():
             toc = generate_toc(notion_content)
 
             filename = f'page_{idx + 1}'
+            if idx == 0:
+                filename = 'index'  # Первый файл будет index.html
             pages_data.append((title, filename))  # Store title and filename for navigation
             save_html(toc, html_content, title, filename, '')  # Temporarily leave navigation empty
 
