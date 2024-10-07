@@ -10,25 +10,25 @@
 <body>
     <header>
         <div class="container">
-            <div class="theme-switch-wrapper">
-                <label class="theme-switch" for="checkbox">
-                    <input type="checkbox" id="checkbox" />
-                    <div class="slider round"></div>
-                </label>
-                <em>Switch Theme</em>
-            </div>
+            <nav class="top-nav">
+                <ul class="pages-navigation">
+                    {{ pages_navigation }}
+                </ul>
+                <div class="theme-switch-wrapper">
+                    <label class="theme-switch" for="checkbox">
+                        <input type="checkbox" id="checkbox" />
+                        <div class="slider round"></div>
+                    </label>
+                    <em>Switch Theme</em>
+                </div>
+            </nav>
         </div>
     </header>
 
     <div class="container main-content">
         <nav class="sidebar">
-            <button class="toggle-sidebar">☰</button>
-            <div class="sidebar-content">
-                <h3>Pages</h3>
-                <ul class="pages-navigation">
-                    {{ pages_navigation }}
-                </ul>
-                <h3>Table of Contents</h3>
+            <button class="toggle-toc">Toggle TOC</button>
+            <div class="toc-content">
                 <ul class="toc">
                     {{ toc }}
                 </ul>
