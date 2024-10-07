@@ -32,7 +32,12 @@ function scrollFunction() {
     if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
         scrollToTopBtn.style.display = "block";
     } else {
-        scrollToTopBtn.style.display = "none";
+        scrollToTopBtnВот продолжение кода в `script.js` и основные изменения:
+
+### Продолжение `script.js`:
+
+```javascript
+    scrollToTopBtn.style.display = "none";
     }
 }
 
