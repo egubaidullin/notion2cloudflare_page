@@ -136,7 +136,7 @@ def generate_toc(blocks):
 
 def save_html(toc, html_content, title, filename, created_time, last_edited_time, all_pages):
     try:
-        with open('template.html', 'r', encoding='utf-8') as f:
+        with open('template2.html', 'r', encoding='utf-8') as f:
             template = f.read()
 
         menu = "<ul>"
