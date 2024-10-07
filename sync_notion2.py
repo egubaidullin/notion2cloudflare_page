@@ -147,14 +147,15 @@ def generate_toc(blocks):
 
 def generate_navigation(pages_data):
     """
-    Generates navigation HTML with links to all pages.
+    Generates navigation HTML with links to all pages in a row, separated by '|'.
     :param pages_data: A list of tuples with (title, filename)
     :return: Navigation HTML string
     """
-    nav_html = "<ul>"
-    for title, filename in pages_data:
-        nav_html += f"<li><a href='{filename}.html'>{title}</a></li>"
-    nav_html += "</ul>"
+    nav_html = ""
+    for i, (title, filename) in enumerate(pages_data):
+        if i > 0:
+            nav_html += " | "  # Add separator for all except the first link
+        nav_html += f"<a href='{filename}.html'>{title}</a>"
     return nav_html
 
 def save_html(toc, html_content, title, filename, navigation):
