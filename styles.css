@@ -125,7 +125,6 @@ header {
     left: 4px;
     position: absolute;
     transition: .4s;
-    width: 26px;
 }
 
 input:checked + .slider {
@@ -207,6 +206,7 @@ pre {
     overflow-x: auto;
     white-space: pre-wrap;
     word-wrap: break-word;
+    margin-bottom: 1rem; /* Увеличение отступа для визуального отделения */
 }
 
 .copy-btn {
