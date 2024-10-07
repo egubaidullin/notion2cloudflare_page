@@ -120,68 +120,15 @@ body.dark-theme header {
     align-items: center;
 }
 
-.theme-switch {
-    display: inline-flex;
-    align-items: center;
-    position: relative;
-    width: 60px;
-    height: 34px;
-    background-color: #ccc;
-    border-radius: 34px;
+#theme-toggle {
+    background: none;
+    border: none;
+    color: var(--text-color);
+    font-size: 1.5em;
     cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-.theme-switch input {
-    display: none;
-}
-
-.sun-icon, .moon-icon {
     position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    pointer-events: none;
-    transition: opacity 0.3s;
-    font-size: 1.5rem; /* Увеличиваем размер иконок */
-}
-
-.sun-icon {
-    color: yellow;
-    left: 5px;
-}
-
-.moon-icon {
-    color: #f1c40f;
-    right: 5px;
-    opacity: 0;
-}
-
-.theme-switch input:checked ~ .sun-icon {
-    opacity: 0;
-}
-
-.theme-switch input:checked ~ .moon-icon {
-    opacity: 1;
-}
-
-.theme-switch input:checked + .theme-switch {
-    background-color: var(--secondary-color);
-}
-
-.theme-switch:before {
-    content: "";
-    position: absolute;
-    height: 26px;
-    width: 26px;
-    left: 4px;
-    bottom: 4px;
-    background-color: white;
-    border-radius: 50%;
-    transition: transform 0.3s;
-}
-
-.theme-switch input:checked + .theme-switch:before {
-    transform: translateX(26px);
+    top: 20px;
+    right: 20px;
 }
 
 .main-content {
