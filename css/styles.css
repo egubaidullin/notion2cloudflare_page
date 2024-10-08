@@ -89,19 +89,19 @@ body.dark {
 
 /* Заголовки */
 h1 {
-  @apply text-4xl font-bold mb-4;
+  /* Используем Tailwind классы напрямую в HTML, поэтому здесь можно оставить базовые стили или удалить */
 }
 
 h2 {
-  @apply text-3xl font-bold mb-4;
+  /* Аналогично */
 }
 
 h3 {
-  @apply text-2xl font-bold mb-4;
+  /* Аналогично */
 }
 
 h4, h5, h6 {
-  @apply text-xl font-bold mb-4;
+  /* Аналогично */
 }
 
 /* Перенос Текста */
