@@ -1,4 +1,3 @@
-/* Основные стили */
 :root {
     --bg-light: #ffffff;
     --text-light: #1a202c;
@@ -10,7 +9,6 @@
 
 body {
     transition: background-color 0.3s, color 0.3s;
-    font-family: Arial, sans-serif;
 }
 
 body.light {
@@ -23,138 +21,50 @@ body.dark {
     color: var(--text-dark);
 }
 
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 1rem;
-}
-
-.top-nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem 0;
-}
-
-.controls {
-    display: flex;
-    align-items: center;
-}
-
-.toggle-toc {
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-    color: inherit;
-}
-
-.pages-navigation a {
-    margin: 0 1rem;
-    text-decoration: none;
-    color: inherit;
-}
-
-.pages-navigation a:hover {
-    color: var(--accent-light);
-}
-
-.theme-switch-wrapper {
-    display: flex;
-    align-items: center;
-}
-
-.theme-switch {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 1.5rem;
-    color: inherit;
-}
-
-/* Боковая панель TOC */
-.sidebar {
-    width: 300px;
+.toc-panel {
     position: fixed;
-    top: 0;
-    left: 0;
-    height: 100vh;
+    top: 4rem;
+    left: -300px;
+    width: 300px;
+    height: calc(100vh - 4rem);
+    overflow-y: auto;
+    transition: left 0.3s ease-in-out;
     background-color: var(--bg-light);
     color: var(--text-light);
-    padding: 2rem 1rem;
+    z-index: 40;
     box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-    transition: transform 0.3s ease-in-out;
-    z-index: 100;
 }
 
-.sidebar.hidden {
-    transform: translateX(-100%);
+.dark .toc-panel {
+    background-color: var(--bg-dark);
+    color: var(--text-dark);
 }
 
-.sidebar .toc ul {
-    list-style: none;
-    padding: 0;
-}
-
-.sidebar .toc li {
-    margin: 1rem 0;
-}
-
-.sidebar .toc a {
-    text-decoration: none;
-    color: inherit;
-}
-
-.sidebar .toc a:hover {
-    color: var(--accent-light);
-}
-
-/* Основной контент */
-.main-content {
-    margin-left: 300px;
-    transition: margin-left 0.3s ease-in-out;
-}
-
-.sidebar.hidden + .main-content {
-    margin-left: 0;
-}
-
-.content {
-    padding: 2rem;
-}
-
-/* Кнопка "Scroll to Top" */
-#scrollToTopBtn {
-    position: fixed;
-    bottom: 2rem;
-    right: 2rem;
-    background-color: var(--accent-light);
-    color: #fff;
-    border: none;
-    padding: 0.75rem;
-    border-radius: 50%;
-    cursor: pointer;
-    display: none;
-    transition: background-color 0.3s;
-}
-
-#scrollToTopBtn:hover {
-    background-color: var(--accent-dark);
-}
-
-/* Overlay для мобильного меню */
-.overlay {
-    display: none;
-    position: fixed;
-    top: 0;
+.toc-panel.open {
     left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.5);
-    z-index: 50;
 }
 
-/* Стили для блоков кода */
+@media (max-width: 768px) {
+    .toc-panel {
+        width: 100%;
+        height: 50vh;
+        left: -100%;
+    }
+
+    .toc-panel.open {
+        left: 0;
+    }
+
+    main {
+        margin-left: 0;
+    }
+
+    .toc-panel.open + main {
+        margin-left: 100%;
+        transition: margin-left 0.3s ease-in-out;
+    }
+}
+
 .code-block {
     position: relative;
     margin: 1rem 0;
@@ -166,7 +76,7 @@ body.dark {
     padding: 1rem;
 }
 
-body.dark .code-block {
+.dark .code-block {
     background-color: var(--bg-dark);
     color: var(--text-dark);
 }
@@ -188,7 +98,7 @@ body.dark .code-block {
     z-index: 10;
 }
 
-body.dark .copy-button {
+.dark .copy-button {
     background-color: var(--bg-dark);
     color: var(--accent-dark);
 }
@@ -215,32 +125,77 @@ body.dark .copy-button {
     opacity: 1;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-    .sidebar {
-        width: 100%;
-        height: 50vh;
-        top: 0;
-        left: -100%;
-    }
+::-webkit-scrollbar {
+    width: 8px;
+}
 
-    .sidebar.open {
-        transform: translateX(0);
-    }
+::-webkit-scrollbar-track {
+    background: var(--bg-light);
+}
 
-    .main-content {
-        margin-left: 0;
-    }
+.dark ::-webkit-scrollbar-track {
+    background: var(--bg-dark);
+}
 
-    .toggle-toc {
-        font-size: 1.5rem;
-    }
+::-webkit-scrollbar-thumb {
+    background: var(--accent-light);
+    border-radius: 4px;
+}
 
-    .pages-navigation {
-        display: none;
-    }
+.dark ::-webkit-scrollbar-thumb {
+    background: var(--accent-dark);
+}
 
-    .overlay {
-        display: block;
-    }
+nav {
+    transition: top 0.3s;
+}
+
+nav.hidden {
+    top: -4rem;
+}
+
+#scrollToTopBtn {
+    transition: opacity 0.3s, visibility 0.3s;
+}
+
+#scrollToTopBtn.hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+#scrollToTopBtn.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.theme-switch-wrapper {
+    display: flex;
+    align-items: center;
+}
+
+.theme-switch {
+    display: inline-block;
+    height: 34px;
+    position: relative;
+    width: 60px;
+}
+
+.theme-switch input {
+    display: none;
+}
+
+.sun-icon, .moon-icon {
+    font-size: 1.2em;
+}
+
+.sun-icon {
+    display: none;
+}
+
+.dark .sun-icon {
+    display: inline-block;
+}
+
+.dark .moon-icon {
+    display: none;
 }
