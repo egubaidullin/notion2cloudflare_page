@@ -5,20 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{ title }}</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.3.1/styles/default.min.css">
-  <style>
-    .toc { background-color: #f9f9f9; padding: 10px; margin-bottom: 20px; }
-    .toc-item a { color: #0073e6; text-decoration: none; }
-    .toc-item a:hover { text-decoration: underline; }
-    .copy-button { position: absolute; right: 10px; top: 10px; background-color: #0073e6; color: white; border: none; padding: 5px; cursor: pointer; }
-    .copied-tooltip { display: none; color: green; font-size: 12px; }
-    .code-block:hover .copied-tooltip { display: inline-block; }
-    .back-to-top { position: fixed; bottom: 20px; right: 20px; background-color: #0073e6; color: white; padding: 10px; border-radius: 50%; display: none; cursor: pointer; }
-  </style>
+  <link rel="stylesheet" href="css/styles.css">
 </head>
 <body class="font-sans leading-normal tracking-normal">
   <!-- Header -->
-  <header class="bg-blue-500 text-white p-4 text-center">
+  <header class="bg-gray-500 text-white p-4 text-center">
     <h1 class="text-4xl font-bold">{{ title }}</h1>
   </header>
 
@@ -27,16 +18,19 @@
     {{ pages_navigation }}
   </nav>
 
-  <!-- TOC (Toggleable) -->
-  <div class="toc-container p-4">
-    <button id="toggle-toc" class="bg-blue-500 text-white px-3 py-2 mb-4">Show/Hide TOC</button>
-    <div id="toc" class="toc">
-      {{ toc }}
-    </div>
+  <!-- TOC (Sidebar or toggleable on mobile) -->
+  <button id="toggle-toc">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="h-6 w-6">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+    </svg>
+  </button>
+
+  <div id="toc" class="toc">
+    {{ toc }}
   </div>
 
   <!-- Content -->
-  <main class="p-4">
+  <main class="container p-4 bg-white shadow-md">
     {{ content }}
   </main>
 
@@ -44,42 +38,6 @@
   <button id="back-to-top" class="back-to-top">↑</button>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.3.1/highlight.min.js"></script>
-  <script>
-    // Syntax highlighting for code blocks
-    document.querySelectorAll('pre code').forEach((el) => {
-      hljs.highlightElement(el);
-    });
-
-    // Toggle TOC visibility
-    document.getElementById('toggle-toc').addEventListener('click', () => {
-      const toc = document.getElementById('toc');
-      toc.style.display = toc.style.display === 'none' ? 'block' : 'none';
-    });
-
-    // Back to top button functionality
-    const backToTopBtn = document.getElementById('back-to-top');
-    window.addEventListener('scroll', () => {
-      if (window.scrollY > 200) {
-        backToTopBtn.style.display = 'block';
-      } else {
-        backToTopBtn.style.display = 'none';
-      }
-    });
-    backToTopBtn.addEventListener('click', () => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-
-    // Copy code functionality
-    document.querySelectorAll('.copy-button').forEach(button => {
-      button.addEventListener('click', function () {
-        const codeBlock = this.previousElementSibling.querySelector('code');
-        navigator.clipboard.writeText(codeBlock.textContent).then(() => {
-          const tooltip = this.querySelector('.copied-tooltip');
-          tooltip.style.display = 'inline';
-          setTimeout(() => { tooltip.style.display = 'none'; }, 1000);
-        });
-      });
-    });
-  </script>
+  <script src="js/scripts.js"></script>
 </body>
 </html>
