@@ -92,7 +92,7 @@ document.querySelectorAll('pre').forEach((block) => {
     button.className = 'copy-btn';
     button.innerHTML = '<i class="fas fa-copy"></i>';
     button.title = 'Copy code';
-    
+
     button.addEventListener('click', () => {
         navigator.clipboard.writeText(block.textContent).then(() => {
             button.innerHTML = '<i class="fas fa-check"></i>';
@@ -105,7 +105,7 @@ document.querySelectorAll('pre').forEach((block) => {
             console.error('Could not copy text: ', err);
         });
     });
-    
+
     block.appendChild(button);
 });
 
