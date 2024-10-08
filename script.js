@@ -1,28 +1,24 @@
 // Theme switcher
-const toggleSwitch = document.querySelector('.theme-switch input[type="checkbox"]');
+const themeSwitchBtn = document.getElementById('theme-switch');
 const sunIcon = document.querySelector('.sun-icon');
 const moonIcon = document.querySelector('.moon-icon');
 
-function switchTheme(e) {
-    if (e.target.checked) {
-        document.body.classList.add('dark-theme');
+function switchTheme() {
+    document.body.classList.toggle('dark-theme');
+    if (document.body.classList.contains('dark-theme')) {
         localStorage.setItem('theme', 'dark');
     } else {
-        document.body.classList.remove('dark-theme');
         localStorage.setItem('theme', 'light');
-    }    
+    }
 }
 
-toggleSwitch.addEventListener('change', switchTheme, false);
+themeSwitchBtn.addEventListener('click', switchTheme);
 
-// Check for saved user preference, if any, on load of the website
-const currentTheme = localStorage.getItem('theme') ? localStorage.getItem('theme') : null;
+// Проверка сохраненной темы при загрузке страницы
+const currentTheme = localStorage.getItem('theme');
 
-if (currentTheme) {
-    if (currentTheme === 'dark') {
-        toggleSwitch.checked = true;
-        document.body.classList.add('dark-theme');
-    }
+if (currentTheme === 'dark') {
+    document.body.classList.add('dark-theme');
 }
 
 // Scroll to top button
