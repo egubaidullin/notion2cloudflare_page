@@ -3,28 +3,51 @@ const themeSwitchBtn = document.getElementById('theme-switch');
 const sunIcon = document.querySelector('.sun-icon');
 const moonIcon = document.querySelector('.moon-icon');
 
+// Функция переключения темы
 function switchTheme() {
     document.body.classList.toggle('dark-theme');
-    if (document.body.classList.contains('dark-theme')) {
+    const isDark = document.body.classList.contains('dark-theme');
+    if (isDark) {
         localStorage.setItem('theme', 'dark');
     } else {
         localStorage.setItem('theme', 'light');
     }
+    updateThemeIcon(isDark);
 }
 
+// Обновление иконки переключателя темы
+function updateThemeIcon(isDark) {
+    if (isDark) {
+        sunIcon.style.opacity = '0';
+        moonIcon.style.opacity = '1';
+    } else {
+        sunIcon.style.opacity = '1';
+        moonIcon.style.opacity = '0';
+    }
+}
+
+// Инициализация темы при загрузке страницы
+function initTheme() {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+        document.body.classList.add('dark-theme');
+        updateThemeIcon(true);
+    } else {
+        document.body.classList.remove('dark-theme');
+        updateThemeIcon(false);
+    }
+}
+
+// Добавление обработчика события на кнопку переключения темы
 themeSwitchBtn.addEventListener('click', switchTheme);
 
-// Проверка сохраненной темы при загрузке страницы
-const currentTheme = localStorage.getItem('theme');
-
-if (currentTheme === 'dark') {
-    document.body.classList.add('dark-theme');
-}
+// Инициализация при загрузке
+initTheme();
 
 // Scroll to top button
 const scrollToTopBtn = document.getElementById("scrollToTopBtn");
 
-window.onscroll = function() {scrollFunction()};
+window.addEventListener('scroll', scrollFunction);
 
 function scrollFunction() {
     if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
@@ -34,41 +57,28 @@ function scrollFunction() {
     }
 }
 
-scrollToTopBtn.addEventListener("click", function() {
+scrollToTopBtn.addEventListener("click", () => {
     window.scrollTo({top: 0, behavior: 'smooth'});
 });
 
 // TOC toggle
 const toggleTocBtn = document.querySelector('.toggle-toc');
 const sidebar = document.querySelector('.sidebar');
-const content = document.querySelector('.content');
-
-// For mobile overlay
-const overlay = document.createElement('div');
-overlay.classList.add('overlay');
-document.body.appendChild(overlay);
+const overlay = document.querySelector('.overlay');
 
 toggleTocBtn.addEventListener('click', () => {
-    sidebar.classList.toggle('hidden');
-    sidebar.classList.toggle('active');
-    overlay.classList.toggle('active');
-
-    if (window.innerWidth <= 768) {
-        if (sidebar.classList.contains('active')) {
-            toggleTocBtn.innerHTML = '<i class="fas fa-times"></i>';
-        } else {
-            toggleTocBtn.innerHTML = '<i class="fas fa-bars"></i>';
-        }
+    const isMobile = window.innerWidth <= 768;
+    if (isMobile) {
+        sidebar.classList.toggle('active');
+        overlay.classList.toggle('active');
+        toggleTocBtn.innerHTML = sidebar.classList.contains('active') ? '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
     } else {
-        if (sidebar.classList.contains('hidden')) {
-            toggleTocBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
-        } else {
-            toggleTocBtn.innerHTML = '<i class="fas fa-bars"></i>';
-        }
+        sidebar.classList.toggle('hidden');
+        toggleTocBtn.innerHTML = sidebar.classList.contains('hidden') ? '<i class="fas fa-chevron-right"></i>' : '<i class="fas fa-bars"></i>';
     }
 });
 
-// Close TOC when clicking on overlay
+// Закрытие TOC при клике на overlay
 overlay.addEventListener('click', () => {
     sidebar.classList.add('hidden');
     sidebar.classList.remove('active');
@@ -76,7 +86,7 @@ overlay.addEventListener('click', () => {
     toggleTocBtn.innerHTML = '<i class="fas fa-bars"></i>';
 });
 
-// Add copy buttons to code blocks
+// Добавление кнопок копирования к блокам кода
 document.querySelectorAll('pre').forEach((block) => {
     const button = document.createElement('button');
     button.className = 'copy-btn';
@@ -85,14 +95,13 @@ document.querySelectorAll('pre').forEach((block) => {
     
     button.addEventListener('click', () => {
         navigator.clipboard.writeText(block.textContent).then(() => {
-            const originalHTML = button.innerHTML;
             button.innerHTML = '<i class="fas fa-check"></i>';
             button.disabled = true;
             setTimeout(() => {
-                button.innerHTML = originalHTML;
+                button.innerHTML = '<i class="fas fa-copy"></i>';
                 button.disabled = false;
             }, 2000);
-        }, (err) => {
+        }).catch((err) => {
             console.error('Could not copy text: ', err);
         });
     });
@@ -100,26 +109,26 @@ document.querySelectorAll('pre').forEach((block) => {
     block.appendChild(button);
 });
 
-// Smooth scrolling for TOC links
+// Плавная прокрутка для ссылок TOC
 document.querySelectorAll('.toc a').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
         e.preventDefault();
-        
-        // Close TOC on mobile after clicking
+        const targetId = this.getAttribute('href').substring(1);
+        const targetElement = document.getElementById(targetId);
+        if (targetElement) {
+            targetElement.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Закрыть TOC на мобильных устройствах после клика
         if (window.innerWidth <= 768) {
-            sidebar.classList.add('hidden');
             sidebar.classList.remove('active');
             overlay.classList.remove('active');
             toggleTocBtn.innerHTML = '<i class="fas fa-bars"></i>';
         }
-
-        document.querySelector(this.getAttribute('href')).scrollIntoView({
-            behavior: 'smooth'
-        });
     });
 });
 
-// Highlight active TOC item
+// Подсветка активного пункта TOC при прокрутке
 const observerOptions = {
     root: null,
     rootMargin: '0px',
@@ -129,10 +138,11 @@ const observerOptions = {
 const observer = new IntersectionObserver(entries => {
     entries.forEach(entry => {
         const id = entry.target.getAttribute('id');
+        const tocLink = document.querySelector(`.toc a[href="#${id}"]`);
         if (entry.isIntersecting) {
-            document.querySelector(`.toc a[href="#${id}"]`).classList.add('active');
+            tocLink.classList.add('active');
         } else {
-            document.querySelector(`.toc a[href="#${id}"]`).classList.remove('active');
+            tocLink.classList.remove('active');
         }
     });
 }, observerOptions);
