@@ -8,15 +8,17 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 NOTION_API_TOKEN = os.getenv('NOTION_API_TOKEN')
 NOTION_PAGE_IDS = os.getenv('NOTION_PAGE_IDS').split(",")
 
-# Добавляем логирование для проверки, установлен ли NOTION_PAGE_IDS
-if not NOTION_PAGE_IDS:
-    logging.error("Переменная окружения 'NOTION_PAGE_IDS' не установлена или пуста.")
-    raise ValueError("Переменная 'NOTION_PAGE_IDS' требуется, но не установлена.")
+# Add logging to check if NOTION_PAGE_IDS is set
+if NOTION_PAGE_IDS is None:
+    logging.error("Environment variable 'NOTION_PAGE_IDS' is not set or is None.")
+    raise ValueError("The 'NOTION_PAGE_IDS' environment variable is required but is not set.")
+else:
+    logging.info(f"NOTION_PAGE_IDS: {NOTION_PAGE_IDS}")
 
-# Проверка, установлен ли NOTION_API_TOKEN
-if not NOTION_API_TOKEN:
-    logging.error("Переменная окружения 'NOTION_API_TOKEN' не установлена.")
-    raise ValueError("Переменная 'NOTION_API_TOKEN' требуется, но не установлена.")
+# Check if NOTION_API_TOKEN is set
+if NOTION_API_TOKEN is None:
+    logging.error("Environment variable 'NOTION_API_TOKEN' is not set.")
+    raise ValueError("The 'NOTION_API_TOKEN' environment variable is required but is not set.")
 
 headers = {
     "Authorization": f"Bearer {NOTION_API_TOKEN}",
@@ -43,10 +45,10 @@ def get_notion_content(page_id):
             has_more = data['has_more']
             start_cursor = data.get('next_cursor')
 
-            logging.info(f"Получено {len(data['results'])} блоков для страницы {page_id}. Всего блоков: {len(all_blocks)}")
+            logging.info(f"Fetched {len(data['results'])} blocks for page {page_id}. Total blocks: {len(all_blocks)}")
 
         except requests.RequestException as e:
-            logging.error(f"Ошибка при получении контента страницы Notion: {e}")
+            logging.error(f"Error fetching Notion page content: {e}")
             raise
 
     return all_blocks
@@ -58,6 +60,16 @@ def convert_to_html(blocks):
     html_content = []
     list_type = None
 
+    # Define mapping from heading level to Tailwind CSS classes
+    heading_class = {
+        1: 'text-4xl',
+        2: 'text-3xl',
+        3: 'text-2xl',
+        4: 'text-xl',
+        5: 'text-lg',
+        6: 'text-base'
+    }
+
     for block in blocks:
         block_type = block['type']
         if block_type == 'paragraph':
@@ -67,7 +79,8 @@ def convert_to_html(blocks):
             level = int(block_type[-1])
             text = get_text_content(block[block_type]['rich_text'])
             heading_id = text.replace(" ", "-").lower()
-            html_content.append(f"<h{level} id='{heading_id}' class='text-{level}xl font-bold mb-4'>{text}</h{level}>")
+            class_name = heading_class.get(level, 'text-base')
+            html_content.append(f"<h{level} id='{heading_id}' class='{class_name} font-bold mb-4'>{text}</h{level}>")
         elif block_type == 'bulleted_list_item':
             if list_type != 'ul':
                 if list_type:
@@ -91,6 +104,7 @@ def convert_to_html(blocks):
             <div class="code-block relative">
               <pre><code class="language-{language}">{code}</code></pre>
               <button class="copy-button" aria-label="Copy code">
+                <!-- Иконка копирования -->
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-copy h-4 w-4">
                   <rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect>
                   <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path>
@@ -112,16 +126,16 @@ def convert_to_html(blocks):
             text = get_text_content(block['callout']['rich_text'])
             html_content.append(f"<div class='callout'>{emoji} {text}</div>")
         
-        # Обработка дочерних блоков, если есть
+        # Process child blocks if present
         if 'has_children' in block and block['has_children']:
             child_blocks = get_child_blocks(block['id'])
             html_content.extend(convert_to_html(child_blocks))
 
-    # Закрытие открытых списков
+    # Close any open list
     if list_type:
         html_content.append(f"</{'ol' if list_type == 'ol' else 'ul'}>")
 
-    return ''.join(html_content)  # Объединяем список в одну строку
+    return ''.join(html_content)  # Join the list into a single string
 
 def get_child_blocks(block_id):
     url = f"https://api.notion.com/v1/blocks/{block_id}/children"
@@ -141,11 +155,11 @@ def get_title(page_id):
         if title_property:
             return title_property[0]["text"]["content"]
 
-        logging.warning("Заголовок страницы не найден.")
-        return "Ваш Заголовок Страницы из Notion"
-    
+        logging.warning("Page title not found.")
+        return "Your Page Title from Notion"
+
     except requests.RequestException as e:
-        logging.error(f"Ошибка при получении заголовка страницы: {e}")
+        logging.error(f"Error fetching page title: {e}")
         raise
 
 def generate_toc(blocks):
@@ -160,14 +174,14 @@ def generate_toc(blocks):
 
 def generate_navigation(pages_data):
     """
-    Генерирует HTML для навигации со ссылками на все страницы в строку, разделённые пробелами.
-    :param pages_data: Список кортежей (заголовок, имя файла)
-    :return: Строка HTML для навигации
+    Generates navigation HTML with links to all pages in a row, separated by ' '.
+    :param pages_data: A list of tuples with (title, filename)
+    :return: Navigation HTML string
     """
     nav_html = ""
     for i, (title, filename) in enumerate(pages_data):
         if i > 0:
-            nav_html += " "  # Добавляем разделитель для всех, кроме первой ссылки
+            nav_html += " "  # Add separator for all except the first link
         nav_html += f"<a href='{filename}.html' class='hover:text-blue-500'>{title}</a>"
     return nav_html
 
@@ -183,18 +197,18 @@ def save_html(toc, html_content, title, filename, navigation):
 
         with open(f'{filename}.html', 'w', encoding='utf-8') as f:
             f.write(full_html)
-        logging.info(f"HTML сохранён в {filename}.html")
+        logging.info(f"HTML content saved to {filename}.html")
     except IOError as e:
-        logging.error(f"Ошибка при сохранении HTML: {e}")
+        logging.error(f"Error saving HTML content: {e}")
         raise
 
 def main():
     try:
-        logging.info("Начало синхронизации страниц Notion...")
+        logging.info("Starting Notion pages sync...")
 
         pages_data = []
         for idx, page_id in enumerate(NOTION_PAGE_IDS):
-            logging.info(f"Обработка страницы {page_id}")
+            logging.info(f"Processing page {page_id}")
             notion_content = get_notion_content(page_id)
             html_content = convert_to_html(notion_content)
             title = get_title(page_id)
@@ -203,22 +217,22 @@ def main():
             filename = f'page_{idx + 1}'
             if idx == 0:
                 filename = 'index'  # Первый файл будет index.html
-            pages_data.append((title, filename))  # Сохраняем заголовок и имя файла для навигации
-            save_html(toc, html_content, title, filename, '')  # Временно оставляем навигацию пустой
+            pages_data.append((title, filename))  # Store title and filename for navigation
+            save_html(toc, html_content, title, filename, '')  # Temporarily leave navigation empty
 
-        # После обработки всех страниц, генерируем навигацию и сохраняем каждую страницу заново
+        # After all pages are processed, generate navigation and save each page again
         navigation = generate_navigation(pages_data)
 
         for title, filename in pages_data:
-            # Повторное сохранение каждой страницы с навигацией
+            # Re-save each page with navigation inserted
             notion_content = get_notion_content(NOTION_PAGE_IDS[pages_data.index((title, filename))])
             html_content = convert_to_html(notion_content)
             toc = generate_toc(notion_content)
             save_html(toc, html_content, title, filename, navigation)
 
-        logging.info("Синхронизация завершена успешно")
+        logging.info("Sync completed successfully")
     except Exception as e:
-        logging.error(f"Синхронизация не удалась: {e}")
+        logging.error(f"Sync failed: {e}")
         raise
 
 if __name__ == "__main__":
