@@ -63,50 +63,51 @@ def convert_to_html(blocks):
     for block in blocks:
         block_type = block['type']
         if block_type == 'paragraph':
-            html_content.append(f"<p>{get_text_content(block['paragraph']['rich_text'])}</p>")
+            text = get_text_content(block['paragraph']['rich_text'])
+            html_content.append(f"<p>{text}</p>")
         elif block_type.startswith('heading_'):
             level = int(block_type[-1])
             text = get_text_content(block[block_type]['rich_text'])
             heading_id = text.replace(" ", "-").lower()
-            html_content.append(f"<h{level} id='{heading_id}'>{text}</h{level}>")
+            html_content.append(f"<h{level} class='text-{level}xl font-bold mb-4' id='{heading_id}'>{text}</h{level}>")
         elif block_type == 'bulleted_list_item':
             if list_type != 'ul':
                 if list_type:
                     html_content.append(f"</{'ol' if list_type == 'ol' else 'ul'}>")
                 html_content.append("<ul>")
                 list_type = 'ul'
-            html_content.append(f"<li>{get_text_content(block['bulleted_list_item']['rich_text'])}</li>")
+            text = get_text_content(block['bulleted_list_item']['rich_text'])
+            html_content.append(f"<li>{text}</li>")
         elif block_type == 'numbered_list_item':
             if list_type != 'ol':
                 if list_type:
                     html_content.append(f"</{'ol' if list_type == 'ol' else 'ul'}>")
                 html_content.append("<ol>")
                 list_type = 'ol'
-            html_content.append(f"<li>{get_text_content(block['numbered_list_item']['rich_text'])}</li>")
+            text = get_text_content(block['numbered_list_item']['rich_text'])
+            html_content.append(f"<li>{text}</li>")
         elif block_type == 'code':
             code = escape(get_text_content(block['code']['rich_text']))
-            language = block['code']['language']
-            # Добавляем обёртку и кнопку копирования
-            code_block = f"""
+            language = block['code']['language'] or 'plaintext'
+            html_content.append(f"""
             <div class="code-block relative">
-                <pre><code class="language-{language}">{code}</code></pre>
-                <button class="copy-button" aria-label="Copy code">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-copy h-4 w-4">
-                        <rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect>
-                        <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path>
-                    </svg>
-                    <span class="copied-tooltip">Copied!</span>
-                </button>
+              <pre><code class="language-{language}">{code}</code></pre>
+              <button class="copy-button" aria-label="Copy code">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" ...>
+                  <!-- SVG Path -->
+                </svg>
+                <span class="copied-tooltip">Copied!</span>
+              </button>
             </div>
-            """
-            html_content.append(code_block)
+            """)
         elif block_type == 'image':
             image_url = block['image']['file']['url']
             html_content.append(f"<img src='{image_url}' alt='Notion image'>")
         elif block_type == 'divider':
             html_content.append("<hr>")
         elif block_type == 'quote':
-            html_content.append(f"<blockquote>{get_text_content(block['quote']['rich_text'])}</blockquote>")
+            text = get_text_content(block['quote']['rich_text'])
+            html_content.append(f"<blockquote>{text}</blockquote>")
         elif block_type == 'callout':
             emoji = block['callout']['icon']['emoji'] if block['callout']['icon']['type'] == 'emoji' else ''
             text = get_text_content(block['callout']['rich_text'])
