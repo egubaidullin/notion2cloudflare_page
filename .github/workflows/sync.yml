@@ -1,4 +1,4 @@
-name: Sync2 Notion Page to Cloudflare Pages
+name: Sync Notion Page to Cloudflare Pages
 
 on:
   schedule:
