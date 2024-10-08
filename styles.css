@@ -1,4 +1,4 @@
-/* Переменные для тем */
+/* Определение цветовых переменных */
 :root {
     /* Светлая тема */
     --bg-color-light: #ffffff;
@@ -11,8 +11,8 @@
     /* Темная тема */
     --bg-color-dark: #1a1a1a;
     --text-color-dark: #ffffff;
-    --primary-color-dark: #2980b9;
-    --secondary-color-dark: #27ae60;
+    --primary-color-dark: #3498db;
+    --secondary-color-dark: #2ecc71;
     --sidebar-bg-dark: #2c2c2c;
     --code-bg-dark: #2a2a2a;
 
@@ -86,6 +86,11 @@ body.dark-theme header {
     font-size: 1.5rem;
 }
 
+.theme-switch-wrapper {
+    display: flex;
+    align-items: center;
+}
+
 .theme-switch {
     background: none;
     border: none;
@@ -96,8 +101,6 @@ body.dark-theme header {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
 }
 
 .theme-switch .sun-icon,
@@ -219,7 +222,17 @@ body.dark-theme .moon-icon {
     }
 
     .pages-navigation {
-        display: none; /* Скрываем навигацию по умолчанию на мобильных */
+        display: flex;
+        flex-direction: row;
+        gap: 0.3rem; /* Уменьшаем расстояние между пунктами */
+        margin-left: 0;
+        width: auto;
+        overflow-x: auto; /* Добавляем горизонтальную прокрутку при необходимости */
+    }
+
+    .pages-navigation a {
+        padding: 0.3rem 0.5rem; /* Уменьшаем отступы */
+        white-space: nowrap;
     }
 
     .sidebar {
@@ -253,34 +266,16 @@ body.dark-theme .moon-icon {
         z-index: 1000;
     }
 
-    .theme-switch {
-        position: absolute;
-        right: 20px;
-    }
-
     .content {
         margin-left: 0;
         padding: 1rem;
-        font-size: 1em;
+        font-size: 1em; /* Уменьшаем размер шрифта на мобильных */
     }
 
-    /* Появление навигации при открытом TOC */
-    .sidebar.active .pages-navigation {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.5rem;
-        width: 100%;
-    }
-
-    /* Плавное появление кнопки TOC */
-    .toggle-toc {
-        z-index: 1002;
-    }
-
-    /* Уменьшение расстояния между пунктами навигации */
-    .sidebar.active .pages-navigation a {
-        padding: 0.3rem 0.5rem;
+    /* Переключатель тем должен быть на той же линии */
+    .theme-switch-wrapper {
+        order: 3; /* Перемещаем переключатель тем в конец на мобильных */
+        margin-top: 0.5rem;
     }
 }
 
