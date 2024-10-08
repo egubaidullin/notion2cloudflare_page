@@ -69,7 +69,7 @@ def convert_to_html(blocks):
             level = int(block_type[-1])
             text = get_text_content(block[block_type]['rich_text'])
             heading_id = text.replace(" ", "-").lower()
-            html_content.append(f"<h{level} class='text-{level}xl font-bold mb-4' id='{heading_id}'>{text}</h{level}>")
+            html_content.append(f"<h{level} id='{heading_id}' class='text-{level}xl font-bold mb-4'>{text}</h{level}>")
         elif block_type == 'bulleted_list_item':
             if list_type != 'ul':
                 if list_type:
@@ -93,8 +93,9 @@ def convert_to_html(blocks):
             <div class="code-block relative">
               <pre><code class="language-{language}">{code}</code></pre>
               <button class="copy-button" aria-label="Copy code">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" ...>
-                  <!-- SVG Path -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-copy h-4 w-4">
+                  <rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect>
+                  <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path>
                 </svg>
                 <span class="copied-tooltip">Copied!</span>
               </button>
@@ -123,7 +124,6 @@ def convert_to_html(blocks):
         html_content.append(f"</{'ol' if list_type == 'ol' else 'ul'}>")
 
     return ''.join(html_content)  # Join the list into a single string
-
 
 def get_child_blocks(block_id):
     url = f"https://api.notion.com/v1/blocks/{block_id}/children"
@@ -170,7 +170,7 @@ def generate_navigation(pages_data):
     for i, (title, filename) in enumerate(pages_data):
         if i > 0:
             nav_html += " "  # Add separator for all except the first link
-        nav_html += f"<a href='{filename}.html'>{title}</a>"
+        nav_html += f"<a href='{filename}.html' class='hover:text-blue-500'>{title}</a>"
     return nav_html
 
 def save_html(toc, html_content, title, filename, navigation):
