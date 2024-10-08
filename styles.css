@@ -1,5 +1,6 @@
+/* Переменные для тем */
 :root {
-    /* Цветовые переменные для светлой темы */
+    /* Светлая тема */
     --bg-color-light: #ffffff;
     --text-color-light: #333333;
     --primary-color-light: #3498db;
@@ -7,11 +8,11 @@
     --sidebar-bg-light: #f4f4f4;
     --code-bg-light: #f8f8f8;
 
-    /* Цветовые переменные для темной темы */
+    /* Темная тема */
     --bg-color-dark: #1a1a1a;
     --text-color-dark: #ffffff;
-    --primary-color-dark: #3498db;
-    --secondary-color-dark: #2ecc71;
+    --primary-color-dark: #2980b9;
+    --secondary-color-dark: #27ae60;
     --sidebar-bg-dark: #2c2c2c;
     --code-bg-dark: #2a2a2a;
 
@@ -68,7 +69,7 @@ body.dark-theme header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    flex-wrap: wrap; /* Позволяет элементам переноситься на новые строки при необходимости */
+    flex-wrap: wrap;
 }
 
 .controls {
@@ -85,11 +86,6 @@ body.dark-theme header {
     font-size: 1.5rem;
 }
 
-.theme-switch-wrapper {
-    display: flex;
-    align-items: center;
-}
-
 .theme-switch {
     background: none;
     border: none;
@@ -100,6 +96,8 @@ body.dark-theme header {
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 40px;
+    height: 40px;
 }
 
 .theme-switch .sun-icon,
@@ -139,7 +137,7 @@ body.dark-theme .moon-icon {
     padding: 0.5rem;
     transition: color 0.3s, background-color 0.3s;
     position: relative;
-    white-space: nowrap; /* Предотвращает перенос текста */
+    white-space: nowrap;
 }
 
 .pages-navigation a:not(:last-child)::after {
@@ -170,7 +168,7 @@ body.dark-theme .moon-icon {
     transition: transform 0.3s ease-in-out;
     left: 0;
     top: 70px;
-    z-index: 1001; /* Повышенный z-index для отображения поверх других элементов */
+    z-index: 1001;
 }
 
 .sidebar.hidden {
@@ -217,20 +215,11 @@ body.dark-theme .moon-icon {
 @media (max-width: 768px) {
     .top-nav {
         justify-content: space-between;
+        width: 100%;
     }
 
     .pages-navigation {
-        display: flex;
-        flex-direction: row;
-        gap: 0.3rem; /* Уменьшаем расстояние между пунктами */
-        margin-left: 0;
-        width: auto;
-        overflow-x: auto; /* Добавляем горизонтальную прокрутку при необходимости */
-    }
-
-    .pages-navigation a {
-        padding: 0.3rem 0.5rem; /* Уменьшаем отступы */
-        white-space: nowrap; /* Предотвращает перенос текста */
+        display: none; /* Скрываем навигацию по умолчанию на мобильных */
     }
 
     .sidebar {
@@ -264,10 +253,34 @@ body.dark-theme .moon-icon {
         z-index: 1000;
     }
 
+    .theme-switch {
+        position: absolute;
+        right: 20px;
+    }
+
     .content {
         margin-left: 0;
         padding: 1rem;
-        font-size: 1em; /* Уменьшаем размер шрифта на мобильных */
+        font-size: 1em;
+    }
+
+    /* Появление навигации при открытом TOC */
+    .sidebar.active .pages-navigation {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+        width: 100%;
+    }
+
+    /* Плавное появление кнопки TOC */
+    .toggle-toc {
+        z-index: 1002;
+    }
+
+    /* Уменьшение расстояния между пунктами навигации */
+    .sidebar.active .pages-navigation a {
+        padding: 0.3rem 0.5rem;
     }
 }
 
