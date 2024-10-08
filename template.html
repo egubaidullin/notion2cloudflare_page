@@ -15,18 +15,22 @@
         <div class="container">
             <nav class="top-nav">
                 <!-- Кнопка TOC -->
-                <button class="toggle-toc" title="Toggle TOC" aria-label="Toggle TOC">
-                    <i class="fas fa-bars"></i>
-                </button>
+                <div class="controls">
+                    <button class="toggle-toc" title="Toggle TOC" aria-label="Toggle Table of Contents">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
                 <!-- Навигационные ссылки -->
                 <div class="pages-navigation">
                     {{ pages_navigation }}
                 </div>
-                <!-- Переключатель темы -->
-                <button class="theme-switch" id="theme-switch" title="Toggle Theme" aria-label="Toggle Theme">
-                    <i class="fas fa-sun sun-icon"></i>
-                    <i class="fas fa-moon moon-icon"></i>
-                </button>
+                <!-- Переключатель тем -->
+                <div class="theme-switch-wrapper">
+                    <button class="theme-switch" id="theme-switch" title="Toggle Theme" aria-label="Toggle Theme">
+                        <i class="fas fa-sun sun-icon"></i>
+                        <i class="fas fa-moon moon-icon"></i>
+                    </button>
+                </div>
             </nav>
         </div>
     </header>
@@ -42,15 +46,15 @@
             </div>
         </nav>
 
-        <!-- Основной контент страницы -->
+        <!-- Основной контент -->
         <main class="content">
             <h1>{{ title }}</h1>
             {{ content }}
         </main>
     </div>
 
-    <!-- Кнопка прокрутки вверх -->
-    <button id="scrollToTopBtn" title="Go to top" aria-label="Scroll to top">
+    <!-- Кнопка "Scroll to Top" -->
+    <button id="scrollToTopBtn" title="Go to top" aria-label="Scroll to Top">
         <i class="fas fa-arrow-up"></i>
     </button>
 
