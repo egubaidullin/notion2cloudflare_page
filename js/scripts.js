@@ -20,10 +20,10 @@ tocToggleBtn.addEventListener('click', () => {
   const isOpen = tocPanel.classList.toggle('open');
   
   if (isOpen) {
-    tocToggleBtn.innerHTML = '&lt;'; // Изменяем иконку при открытии
+    tocToggleBtn.innerHTML = '&lt;'; // Измените иконку при открытии
     contentWrapper.classList.add('shifted');
   } else {
-    tocToggleBtn.innerHTML = '&gt;'; // Изменяем иконку при закрытии
+    tocToggleBtn.innerHTML = '&gt;'; // Измените иконку при закрытии
     contentWrapper.classList.remove('shifted');
   }
 });
@@ -61,15 +61,15 @@ copyButtons.forEach(button => {
         button.classList.remove('copied');
       }, 2000);
     }).catch(err => {
-      console.error('Не удалось скопировать текст: ', err);
+      console.error('Failed to copy text: ', err);
     });
   });
 });
 
 // Hide/Show Navbar on Scroll
 let lastScrollY = window.scrollY;
-const navBar = document.querySelector('nav');
 let hideNavTimeout;
+const navBar = document.querySelector('nav');
 
 window.addEventListener('scroll', () => {
   if (window.scrollY > lastScrollY && window.scrollY > 100) {
@@ -84,7 +84,7 @@ window.addEventListener('scroll', () => {
   
   clearTimeout(hideNavTimeout);
   hideNavTimeout = setTimeout(() => {
-    if (window.scrollY > 100) { // Скрываем только если прокрутили больше 100px
+    if (window.scrollY > 100) { // Скрываем навбар только если прокручено больше 100px
       navBar.classList.add('hidden');
     }
   }, 3000);
