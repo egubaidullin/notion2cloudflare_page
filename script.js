@@ -1,23 +1,22 @@
 // TOC Toggle
-const tocToggleBtn = document.querySelector('.toggle-toc');
-const sidebar = document.querySelector('.sidebar');
-const overlay = document.querySelector('.overlay');
+const tocToggleBtn = document.getElementById('toc-toggle');
+const tocPanel = document.getElementById('toc-panel');
 
 tocToggleBtn.addEventListener('click', () => {
-    sidebar.classList.toggle('hidden');
-    sidebar.classList.toggle('open');
+    tocPanel.classList.toggle('open');
 });
 
-// Overlay Click to Close Sidebar
-overlay.addEventListener('click', () => {
-    sidebar.classList.add('hidden');
-    sidebar.classList.remove('open');
+// Mobile Menu Toggle
+const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+const mobileMenu = document.getElementById('mobile-menu');
+
+mobileMenuToggle.addEventListener('click', () => {
+    mobileMenu.classList.toggle('hidden');
+    tocPanel.classList.remove('open');
 });
 
 // Theme Toggle
 const themeSwitch = document.getElementById('theme-switch');
-const sunIcon = document.querySelector('.sun-icon');
-const moonIcon = document.querySelector('.moon-icon');
 
 themeSwitch.addEventListener('click', () => {
     document.body.classList.toggle('dark');
@@ -42,17 +41,37 @@ copyButtons.forEach(button => {
     });
 });
 
+// Hide/Show Navbar on Scroll
+let hideNavTimeout;
+const navBar = document.querySelector('nav');
+
+window.addEventListener('scroll', () => {
+    navBar.classList.remove('hidden');
+    clearTimeout(hideNavTimeout);
+    hideNavTimeout = setTimeout(() => {
+        navBar.classList.add('hidden');
+    }, 3000);
+});
+
 // Scroll to Top Button
 const scrollToTopBtn = document.getElementById('scrollToTopBtn');
 
 window.addEventListener('scroll', () => {
     if (window.scrollY > 300) {
-        scrollToTopBtn.style.display = 'block';
+        scrollToTopBtn.classList.add('show');
+        scrollToTopBtn.classList.remove('hidden');
     } else {
-        scrollToTopBtn.style.display = 'none';
+        scrollToTopBtn.classList.add('hidden');
+        scrollToTopBtn.classList.remove('show');
     }
 });
 
 scrollToTopBtn.addEventListener('click', () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+// TOC Scroll Functionality
+tocPanel.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    tocPanel.scrollBy({ top: e.deltaY, left: 0, behavior: 'smooth' });
 });
