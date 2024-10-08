@@ -60,16 +60,6 @@ def convert_to_html(blocks):
     html_content = []
     list_type = None
 
-    # Define mapping from heading level to Tailwind CSS classes
-    heading_class = {
-        1: 'text-4xl',
-        2: 'text-3xl',
-        3: 'text-2xl',
-        4: 'text-xl',
-        5: 'text-lg',
-        6: 'text-base'
-    }
-
     for block in blocks:
         block_type = block['type']
         if block_type == 'paragraph':
@@ -79,8 +69,18 @@ def convert_to_html(blocks):
             level = int(block_type[-1])
             text = get_text_content(block[block_type]['rich_text'])
             heading_id = text.replace(" ", "-").lower()
-            class_name = heading_class.get(level, 'text-base')
-            html_content.append(f"<h{level} id='{heading_id}' class='{class_name} font-bold mb-4'>{text}</h{level}>")
+            
+            # Определяем класс текста в зависимости от уровня заголовка
+            if level == 1:
+                text_size = 'text-4xl'
+            elif level == 2:
+                text_size = 'text-3xl'
+            elif level == 3:
+                text_size = 'text-2xl'
+            else:
+                text_size = 'text-xl'  # Для h4, h5, h6
+            
+            html_content.append(f"<h{level} id='{heading_id}' class='{text_size} font-bold mb-4'>{text}</h{level}>")
         elif block_type == 'bulleted_list_item':
             if list_type != 'ul':
                 if list_type:
@@ -104,7 +104,6 @@ def convert_to_html(blocks):
             <div class="code-block relative">
               <pre><code class="language-{language}">{code}</code></pre>
               <button class="copy-button" aria-label="Copy code">
-                <!-- Иконка копирования -->
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-copy h-4 w-4">
                   <rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect>
                   <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path>
