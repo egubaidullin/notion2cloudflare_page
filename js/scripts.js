@@ -5,11 +5,12 @@ const contentWrapper = document.getElementById('content-wrapper');
 
 tocToggleBtn.addEventListener('click', () => {
   const isOpen = tocPanel.classList.toggle('open');
-  tocToggleBtn.innerHTML = isOpen ? '&lt;' : '&gt;';
   
   if (isOpen) {
+    tocToggleBtn.innerHTML = '&lt;'; // Измените иконку при открытии
     contentWrapper.classList.add('shifted');
   } else {
+    tocToggleBtn.innerHTML = '&gt;'; // Измените иконку при закрытии
     contentWrapper.classList.remove('shifted');
   }
 });
@@ -60,11 +61,21 @@ copyButtons.forEach(button => {
 });
 
 // Hide/Show Navbar on Scroll
+let lastScrollY = window.scrollY;
 let hideNavTimeout;
 const navBar = document.querySelector('nav');
 
 window.addEventListener('scroll', () => {
-  navBar.classList.remove('hidden');
+  if (window.scrollY > lastScrollY && window.scrollY > 100) {
+    // Пользователь скроллит вниз и прошёл определённое расстояние
+    navBar.classList.add('hidden');
+  } else {
+    // Пользователь скроллит вверх
+    navBar.classList.remove('hidden');
+  }
+  
+  lastScrollY = window.scrollY;
+  
   clearTimeout(hideNavTimeout);
   hideNavTimeout = setTimeout(() => {
     navBar.classList.add('hidden');
