@@ -86,7 +86,20 @@ def convert_to_html(blocks):
         elif block_type == 'code':
             code = escape(get_text_content(block['code']['rich_text']))
             language = block['code']['language']
-            html_content.append(f"<pre><code class='{language}'>{code}</code></pre>")
+            # Добавляем обёртку и кнопку копирования
+            code_block = f"""
+            <div class="code-block relative">
+                <pre><code class="language-{language}">{code}</code></pre>
+                <button class="copy-button" aria-label="Copy code">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-copy h-4 w-4">
+                        <rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect>
+                        <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path>
+                    </svg>
+                    <span class="copied-tooltip">Copied!</span>
+                </button>
+            </div>
+            """
+            html_content.append(code_block)
         elif block_type == 'image':
             image_url = block['image']['file']['url']
             html_content.append(f"<img src='{image_url}' alt='Notion image'>")
@@ -109,6 +122,7 @@ def convert_to_html(blocks):
         html_content.append(f"</{'ol' if list_type == 'ol' else 'ul'}>")
 
     return ''.join(html_content)  # Join the list into a single string
+
 
 def get_child_blocks(block_id):
     url = f"https://api.notion.com/v1/blocks/{block_id}/children"
