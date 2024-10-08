@@ -1,65 +1,65 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ title }}</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism.min.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ title }}</title>
+  <!-- Подключение внешних CSS-файлов -->
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css"> <!-- Внешний CSS -->
 </head>
 <body class="light">
-    <header>
-        <nav class="fixed top-0 left-0 right-0 bg-gray-800 text-white p-4 flex justify-between items-center z-50">
-            <div class="flex items-center">
-                <button id="toc-toggle" class="mr-4 focus:outline-none" aria-label="Toggle TOC">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <div class="hidden md:flex space-x-4 pages-navigation">
-                    {{ pages_navigation }}
-                </div>
-                <button id="mobile-menu-toggle" class="md:hidden focus:outline-none" aria-label="Toggle Mobile Menu">
-                    <i class="fas fa-ellipsis-v"></i>
-                </button>
-            </div>
-            <div class="theme-switch-wrapper">
-                <button id="theme-switch" class="theme-switch p-2 focus:outline-none" aria-label="Toggle Theme">
-                    <i class="fas fa-sun sun-icon"></i>
-                    <i class="fas fa-moon moon-icon"></i>
-                </button>
-            </div>
-        </nav>
-    </header>
-
-    <div id="mobile-menu" class="hidden md:hidden bg-gray-800 text-white p-4 space-y-2">
+  <nav class="fixed top-0 left-0 right-0 bg-gray-800 text-white p-4 flex justify-between items-center z-50">
+    <!-- Ваш навигационный контент -->
+    <div class="flex items-center">
+      <button id="toc-toggle" class="mr-4 focus:outline-none" aria-label="Toggle TOC">
+        &lt;
+      </button>
+      <div class="hidden md:flex space-x-4">
         {{ pages_navigation }}
+      </div>
+      <button id="mobile-menu-toggle" class="md:hidden focus:outline-none" aria-label="Toggle Mobile Menu">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
     </div>
-
-    <div class="container main-content mx-auto px-4 pt-20 pb-8">
-        <nav id="toc-panel" class="sidebar toc-panel bg-gray-100 dark:bg-gray-800 p-4 flex" aria-label="Table of Contents">
-            <div class="toc-content flex-1 overflow-y-auto">
-                <h2 class="text-lg font-semibold mb-4">Содержание</h2>
-                <ul class="toc">
-                    {{ toc }}
-                </ul>
-            </div>
-        </nav>
-
-        <main class="content">
-            <h1>{{ title }}</h1>
-            {{ content }}
-        </main>
+    <div class="flex items-center">
+      <button id="theme-toggle" class="p-2 focus:outline-none" aria-label="Toggle Theme">
+        <svg id="theme-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path id="moon-icon" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+        </svg>
+      </button>
     </div>
+  </nav>
 
-    <button id="scrollToTopBtn" class="hidden fixed bottom-4 right-4 bg-blue-500 text-white p-3 rounded-full shadow-lg hover:bg-blue-600 focus:outline-none" aria-label="Scroll to Top">
-        <i class="fas fa-arrow-up"></i>
-    </button>
+  <div id="mobile-menu" class="hidden md:hidden bg-gray-800 text-white p-4 space-y-2">
+    {{ pages_navigation }}
+  </div>
 
-    <div class="overlay"></div>
+  <div id="toc-panel" class="toc-panel bg-gray-100 dark:bg-gray-800 p-4 flex">
+    <div class="flex-1 overflow-y-auto">
+      <h2 class="text-lg font-semibold mb-4">Table of Contents</h2>
+      {{ toc }}
+    </div>
+  </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-bash.min.js"></script>
-    <script src="script.js"></script>
+  <div id="content-wrapper" class="content-wrapper transition-transform duration-300">
+    <main class="container mx-auto px-4 pt-20 pb-8">
+      {{ content }}
+    </main>
+  </div>
+
+  <button id="back-to-top" class="hidden fixed bottom-4 right-4 bg-blue-500 text-white p-3 rounded-full shadow-lg hover:bg-blue-600 focus:outline-none" aria-label="Back to Top">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+    </svg>
+  </button>
+
+  <!-- Подключение JS-библиотек -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-python.min.js"></script>
+  <script src="js/scripts.js" defer></script> <!-- Внешний JS -->
 </body>
 </html>
