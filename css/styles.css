@@ -1,4 +1,4 @@
-/* Custom Styles */
+/* Основные Переменные */
 :root {
   --bg-light: #ffffff;
   --text-light: #1a202c;
@@ -8,10 +8,10 @@
   --accent-dark: #a0aec0;
 }
 
+/* Основные Стили */
 body {
   transition: background-color 0.3s, color 0.3s;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
+  overflow-x: hidden; /* Предотвращает горизонтальный скролл */
 }
 
 body.light {
@@ -24,24 +24,23 @@ body.dark {
   color: var(--text-dark);
 }
 
-.content-wrapper {
-  transition: transform 0.3s ease-in-out;
+/* Контейнер для TOC и Контента */
+.container-flex {
+  display: flex;
+  transition: margin-left 0.3s ease-in-out;
 }
 
-.content-wrapper.shifted {
-  transform: translateX(300px);
-}
-
+/* TOC Панель */
 .toc-panel {
+  width: 300px;
+  background-color: var(--bg-light);
+  color: var(--text-light);
   position: fixed;
   top: 4rem; /* Высота навбара */
-  left: -300px; /* Начальное положение за экраном */
-  width: 300px;
+  left: -300px; /* Скрыта за экраном */
   height: calc(100vh - 4rem);
   overflow-y: auto;
   transition: left 0.3s ease-in-out;
-  background-color: var(--bg-light);
-  color: var(--text-light);
   z-index: 40;
   box-shadow: 2px 0 5px rgba(0,0,0,0.1);
 }
@@ -55,25 +54,36 @@ body.dark {
   left: 0;
 }
 
+/* Основной Контент */
+.content-wrapper {
+  flex: 1;
+  margin-left: 0;
+  transition: margin-left 0.3s ease-in-out;
+}
+
+.content-wrapper.shifted {
+  margin-left: 300px;
+}
+
 @media (max-width: 768px) {
   .toc-panel {
     width: 100%;
     height: 50vh;
-    left: -100%; /* Полностью скрыт */
+    left: -100%;
   }
 
   .toc-panel.open {
     left: 0;
   }
 
-  /* Основной контент не сдвигается на мобильных */
+  /* На мобильных устройствах основной контент не сдвигается */
   .content-wrapper.shifted {
-    transform: translateX(0);
+    margin-left: 0;
     opacity: 0.5;
-    pointer-events: none; /* Делает контент неактивным */
+    pointer-events: none;
   }
 
-  /* Мобильное меню */
+  /* Мобильное Меню */
   #mobile-menu {
     transition: transform 0.3s ease-in-out;
   }
@@ -89,19 +99,19 @@ body.dark {
 
 /* Заголовки */
 h1 {
-  /* Используем Tailwind классы напрямую в HTML, поэтому здесь можно оставить базовые стили или удалить */
+  @apply text-4xl font-bold mb-4;
 }
 
 h2 {
-  /* Аналогично */
+  @apply text-3xl font-bold mb-4;
 }
 
 h3 {
-  /* Аналогично */
+  @apply text-2xl font-bold mb-4;
 }
 
 h4, h5, h6 {
-  /* Аналогично */
+  @apply text-xl font-bold mb-4;
 }
 
 /* Перенос Текста */
