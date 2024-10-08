@@ -4,31 +4,37 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ title }}</title>
+    <!-- Подключение стилей -->
     <link rel="stylesheet" href="styles.css">
+    <!-- Подключение Font Awesome для иконок -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
+    <!-- Заголовок сайта -->
     <header>
         <div class="container">
             <nav class="top-nav">
-                <div class="controls">
-                    <button class="toggle-toc" title="Toggle TOC"><i class="fas fa-bars"></i></button>
-                </div>
+                <!-- Кнопка TOC -->
+                <button class="toggle-toc" title="Toggle TOC" aria-label="Toggle TOC">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <!-- Навигационные ссылки -->
                 <div class="pages-navigation">
                     {{ pages_navigation }}
                 </div>
-                <div class="theme-switch-wrapper">
-                    <button class="theme-switch" id="theme-switch" title="Toggle Theme" aria-label="Toggle Theme">
-                        <i class="fas fa-sun sun-icon"></i>
-                        <i class="fas fa-moon moon-icon"></i>
-                    </button>
-                </div>
+                <!-- Переключатель темы -->
+                <button class="theme-switch" id="theme-switch" title="Toggle Theme" aria-label="Toggle Theme">
+                    <i class="fas fa-sun sun-icon"></i>
+                    <i class="fas fa-moon moon-icon"></i>
+                </button>
             </nav>
         </div>
     </header>
 
+    <!-- Основное содержимое -->
     <div class="container main-content">
-        <nav class="sidebar hidden">
+        <!-- Боковая панель TOC -->
+        <nav class="sidebar hidden" aria-label="Table of Contents">
             <div class="toc-content">
                 <ul class="toc">
                     {{ toc }}
@@ -36,17 +42,22 @@
             </div>
         </nav>
 
+        <!-- Основной контент страницы -->
         <main class="content">
             <h1>{{ title }}</h1>
             {{ content }}
         </main>
     </div>
 
-    <button id="scrollToTopBtn" title="Go to top" aria-label="Scroll to top"><i class="fas fa-arrow-up"></i></button>
+    <!-- Кнопка прокрутки вверх -->
+    <button id="scrollToTopBtn" title="Go to top" aria-label="Scroll to top">
+        <i class="fas fa-arrow-up"></i>
+    </button>
 
     <!-- Overlay для мобильного меню -->
     <div class="overlay"></div>
 
+    <!-- Подключение скриптов -->
     <script src="script.js"></script>
 </body>
 </html>
