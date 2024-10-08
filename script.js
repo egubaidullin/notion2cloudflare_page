@@ -1,4 +1,4 @@
-// Theme switcher
+// Theme Switcher
 const themeSwitchBtn = document.getElementById('theme-switch');
 const sunIcon = document.querySelector('.sun-icon');
 const moonIcon = document.querySelector('.moon-icon');
@@ -44,7 +44,7 @@ themeSwitchBtn.addEventListener('click', switchTheme);
 // Инициализация при загрузке
 initTheme();
 
-// Scroll to top button
+// Scroll to Top Button
 const scrollToTopBtn = document.getElementById("scrollToTopBtn");
 
 window.addEventListener('scroll', scrollFunction);
@@ -61,7 +61,7 @@ scrollToTopBtn.addEventListener("click", () => {
     window.scrollTo({top: 0, behavior: 'smooth'});
 });
 
-// TOC toggle
+// TOC Toggle
 const toggleTocBtn = document.querySelector('.toggle-toc');
 const sidebar = document.querySelector('.sidebar');
 const overlay = document.querySelector('.overlay');
