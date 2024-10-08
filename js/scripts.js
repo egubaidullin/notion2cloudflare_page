@@ -3,6 +3,19 @@ const tocToggleBtn = document.getElementById('toc-toggle');
 const tocPanel = document.getElementById('toc-panel');
 const contentWrapper = document.getElementById('content-wrapper');
 
+// Mobile Menu Toggle
+const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+const mobileMenu = document.getElementById('mobile-menu');
+
+// Theme Toggle
+const themeToggle = document.getElementById('theme-toggle');
+const themeIcon = document.getElementById('theme-icon');
+const moonIcon = document.getElementById('moon-icon');
+
+// Back to Top Button
+const backToTopButton = document.getElementById('back-to-top');
+
+// TOC Toggle Event
 tocToggleBtn.addEventListener('click', () => {
   const isOpen = tocPanel.classList.toggle('open');
   
@@ -15,10 +28,7 @@ tocToggleBtn.addEventListener('click', () => {
   }
 });
 
-// Mobile Menu Toggle
-const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
-const mobileMenu = document.getElementById('mobile-menu');
-
+// Mobile Menu Toggle Event
 mobileMenuToggle.addEventListener('click', () => {
   mobileMenu.classList.toggle('hidden');
   tocPanel.classList.remove('open');
@@ -26,11 +36,7 @@ mobileMenuToggle.addEventListener('click', () => {
   contentWrapper.classList.remove('shifted');
 });
 
-// Theme Toggle
-const themeToggle = document.getElementById('theme-toggle');
-const themeIcon = document.getElementById('theme-icon');
-const moonIcon = document.getElementById('moon-icon');
-
+// Theme Toggle Event
 themeToggle.addEventListener('click', () => {
   document.body.classList.toggle('dark');
   document.body.classList.toggle('light');
@@ -82,9 +88,7 @@ window.addEventListener('scroll', () => {
   }, 3000);
 });
 
-// Back to Top Button
-const backToTopButton = document.getElementById('back-to-top');
-
+// Back to Top Button Visibility
 window.addEventListener('scroll', () => {
   if (window.scrollY > 300) {
     backToTopButton.classList.add('show');
@@ -95,6 +99,7 @@ window.addEventListener('scroll', () => {
   }
 });
 
+// Back to Top Button Click Event
 backToTopButton.addEventListener('click', () => {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 });
