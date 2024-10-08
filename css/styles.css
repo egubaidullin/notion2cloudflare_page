@@ -1,246 +1,72 @@
-/* Основные Переменные */
-:root {
-  --bg-light: #ffffff;
-  --text-light: #1a202c;
-  --bg-dark: #1a202c;
-  --text-dark: #f7fafc;
-  --accent-light: #4a5568;
-  --accent-dark: #a0aec0;
-}
-
-/* Основные Стили */
 body {
-  transition: background-color 0.3s, color 0.3s;
-  overflow-x: hidden; /* Предотвращает горизонтальный скролл */
-}
-
-body.light {
-  background-color: var(--bg-light);
-  color: var(--text-light);
-}
-
-body.dark {
-  background-color: var(--bg-dark);
-  color: var(--text-dark);
-}
-
-/* Контейнер для TOC и Контента */
-.container-flex {
-  display: flex;
-  transition: margin-left 0.3s ease-in-out;
-}
-
-/* TOC Панель */
-.toc-panel {
-  width: 300px;
-  background-color: var(--bg-light);
-  color: var(--text-light);
-  position: fixed;
-  top: 4rem; /* Высота навбара */
-  left: -300px; /* Скрыта за экраном */
-  height: calc(100vh - 4rem);
-  overflow-y: auto;
-  transition: left 0.3s ease-in-out;
-  z-index: 40;
-  box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-}
-
-.dark .toc-panel {
-  background-color: var(--bg-dark);
-  color: var(--text-dark);
-}
-
-.toc-panel.open {
-  left: 0;
-}
-
-/* Основной Контент */
-.content-wrapper {
-  flex: 1;
-  margin-left: 0;
-  transition: margin-left 0.3s ease-in-out;
-}
-
-.content-wrapper.shifted {
-  margin-left: 300px;
-}
-
-@media (max-width: 768px) {
-  .toc-panel {
-    width: 100%;
-    height: 50vh;
-    left: -100%;
-  }
-
-  .toc-panel.open {
-    left: 0;
-  }
-
-  /* На мобильных устройствах основной контент не сдвигается */
-  .content-wrapper.shifted {
-    margin-left: 0;
-    opacity: 0.5;
-    pointer-events: none;
-  }
-
-  /* Мобильное Меню */
-  #mobile-menu {
-    transition: transform 0.3s ease-in-out;
-  }
-
-  #mobile-menu.hidden {
-    transform: translateY(-100%);
-  }
-
-  #mobile-menu:not(.hidden) {
-    transform: translateY(0);
-  }
-}
-
-/* Заголовки */
-h1 {
-  @apply text-4xl font-bold mb-4;
-}
-
-h2 {
-  @apply text-3xl font-bold mb-4;
-}
-
-h3 {
-  @apply text-2xl font-bold mb-4;
-}
-
-h4, h5, h6 {
-  @apply text-xl font-bold mb-4;
-}
-
-/* Перенос Текста */
-pre, code {
-  white-space: pre-wrap; /* Позволяет переносить строки в блоках кода */
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-}
-
-.code-block pre {
-  white-space: pre-wrap;
-  word-break: break-all; /* Разрывает слова, если необходимо */
-}
-
-/* TOC и Навигация */
-.toc {
-  list-style: none;
-  padding: 0;
-}
-
-.toc-item a {
-  text-decoration: none;
-  color: var(--text-light);
-}
-
-body.dark .toc-item a {
-  color: var(--text-dark);
-}
-
-.toc-item a:hover {
-  color: var(--accent-light);
-}
-
-body.dark .toc-item a:hover {
-  color: var(--accent-dark);
-}
-
-nav a {
-  text-decoration: none;
-  color: inherit;
-}
-
-nav a:hover {
-  color: var(--accent-light);
-}
-
-body.dark nav a:hover {
-  color: var(--accent-dark);
-}
-
-/* Блоки Кода */
-.code-block {
-  position: relative;
-  margin: 1rem 0;
-  border-radius: 0.75rem;
-  overflow: hidden;
-  background-color: var(--bg-light);
-  color: var(--text-light);
-  transition: background-color 0.3s, color 0.3s;
-  padding: 1rem;
-}
-
-.dark .code-block {
-  background-color: var(--bg-dark);
-  color: var(--text-dark);
-}
-
-.code-block pre {
   background-color: #f5f5f5;
-  padding: 1rem;
-  border-radius: 0.5rem;
-  overflow-x: auto;
 }
-
-body.dark .code-block pre {
-  background-color: #2d3748;
-  color: #cbd5e0;
+.container {
+  max-width: 800px;
+  margin: auto;
 }
-
-/* Кнопка Копирования */
-.copy-button {
-  position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
-  background-color: var(--bg-light);
-  border: none;
-  border-radius: 0.5rem;
-  color: var(--accent-light);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.25rem;
-  transition: color 0.3s, background-color 0.3s;
-  cursor: pointer;
-  z-index: 10;
+.toc { 
+  background-color: #e0e0e0; 
+  padding: 10px; 
+  margin-bottom: 20px; 
+  max-width: 250px;
+  position: fixed;
+  top: 20px;
+  left: 20px;
 }
-
-.dark .copy-button {
-  background-color: var(--bg-dark);
-  color: var(--accent-dark);
+.toc-item a { 
+  color: #0073e6; 
+  text-decoration: none; 
 }
-
-.copy-button:hover {
-  color: var(--accent-dark);
+.toc-item a:hover { 
+  text-decoration: underline; 
 }
-
-.copied-tooltip {
-  position: absolute;
-  top: -1.5rem;
-  right: 1rem;
-  background-color: rgba(0, 0, 0, 0.75);
-  color: #fff;
-  padding: 0.25rem 0.5rem;
-  border-radius: 0.25rem;
-  font-size: 0.75rem;
-  opacity: 0;
-  transition: opacity 0.3s;
-  pointer-events: none;
+.copy-button { 
+  position: absolute; 
+  right: 10px; 
+  top: 10px; 
+  background-color: #0073e6; 
+  color: white; 
+  border: none; 
+  padding: 5px; 
+  cursor: pointer; 
 }
-
-.copy-button.copied .copied-tooltip {
-  opacity: 1;
+.copied-tooltip { 
+  display: none; 
+  color: green; 
+  font-size: 12px; 
 }
-
-/* Кнопка Back to Top */
-#back-to-top.show {
-  display: block;
+.code-block:hover .copied-tooltip { 
+  display: inline-block; 
 }
-
-#back-to-top.hidden {
+.back-to-top { 
+  position: fixed; 
+  bottom: 20px; 
+  right: 20px; 
+  background-color: #888; 
+  color: white; 
+  padding: 15px; 
+  border-radius: 50%; 
+  display: none; 
+  cursor: pointer; 
+}
+#toggle-toc {
   display: none;
+}
+@media (max-width: 768px) {
+  #toggle-toc {
+    display: block;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #0073e6;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+  }
+  .toc {
+    display: none;
+    position: static;
+    max-width: 100%;
+  }
 }
