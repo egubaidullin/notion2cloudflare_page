@@ -6,15 +6,14 @@ from html import escape
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 NOTION_API_TOKEN = os.getenv('NOTION_API_TOKEN')
-NOTION_PAGE_IDS = os.getenv('NOTION_PAGE_IDS').split(",")
+NOTION_PAGE_IDS = os.getenv('NOTION_PAGE_IDS')
 
-if NOTION_PAGE_IDS is None:
+if not NOTION_PAGE_IDS:
     logging.error("Environment variable 'NOTION_PAGE_IDS' is not set or is None.")
     raise ValueError("The 'NOTION_PAGE_IDS' environment variable is required but is not set.")
-else:
-    logging.info(f"NOTION_PAGE_IDS: {NOTION_PAGE_IDS}")
+NOTION_PAGE_IDS = NOTION_PAGE_IDS.split(",")
 
-if NOTION_API_TOKEN is None:
+if not NOTION_API_TOKEN:
     logging.error("Environment variable 'NOTION_API_TOKEN' is not set.")
     raise ValueError("The 'NOTION_API_TOKEN' environment variable is required but is not set.")
 
@@ -39,11 +38,11 @@ def get_notion_content(page_id):
             response.raise_for_status()
             data = response.json()
 
-            all_blocks.extend(data['results'])
-            has_more = data['has_more']
+            all_blocks.extend(data.get('results', []))
+            has_more = data.get('has_more', False)
             start_cursor = data.get('next_cursor')
 
-            logging.info(f"Fetched {len(data['results'])} blocks for page {page_id}. Total blocks: {len(all_blocks)}")
+            logging.info(f"Fetched {len(data.get('results', []))} blocks for page {page_id}. Total blocks: {len(all_blocks)}")
 
         except requests.RequestException as e:
             logging.error(f"Error fetching Notion page content: {e}")
@@ -52,77 +51,66 @@ def get_notion_content(page_id):
     return all_blocks
 
 def get_text_content(rich_text):
-    return ''.join([t['plain_text'] for t in rich_text])
+    return ''.join([t.get('plain_text', '') for t in rich_text])
 
 def convert_to_html(blocks):
     html_content = []
     list_type = None
 
     for block in blocks:
-        block_type = block['type']
-        
+        block_type = block.get('type')
+
         if block_type == 'paragraph':
-            text = get_text_content(block['paragraph']['rich_text'])
+            text = get_text_content(block['paragraph'].get('rich_text', []))
             html_content.append(f"<p>{text}</p>")
-            
+
         elif block_type.startswith('heading_'):
-            level = int(block_type[-1])
-            text = get_text_content(block[block_type]['rich_text'])
+            level = int(block_type.split('_')[-1])
+            text = get_text_content(block[block_type].get('rich_text', []))
             heading_id = text.replace(" ", "-").lower()
-            
-            # Структурируем заголовки для TOC и улучшенной читаемости
             html_content.append(f"<h{level} id='{heading_id}' class='heading-level-{level}'>{text}</h{level}>")
-        
-        elif block_type == 'bulleted_list_item':
-            if list_type != 'ul':
+
+        elif block_type in ['bulleted_list_item', 'numbered_list_item']:
+            current_list = 'ul' if block_type == 'bulleted_list_item' else 'ol'
+            if list_type != current_list:
                 if list_type:
                     html_content.append(f"</{list_type}>")
-                html_content.append("<ul>")
-                list_type = 'ul'
-            text = get_text_content(block['bulleted_list_item']['rich_text'])
+                html_content.append(f"<{current_list}>")
+                list_type = current_list
+            text = get_text_content(block[block_type].get('rich_text', []))
             html_content.append(f"<li>{text}</li>")
-        
-        elif block_type == 'numbered_list_item':
-            if list_type != 'ol':
-                if list_type:
-                    html_content.append(f"</{list_type}>")
-                html_content.append("<ol>")
-                list_type = 'ol'
-            text = get_text_content(block['numbered_list_item']['rich_text'])
-            html_content.append(f"<li>{text}</li>")
-        
+
         elif block_type == 'code':
-            code = escape(get_text_content(block['code']['rich_text']))
-            language = block['code']['language'] or 'plaintext'
+            code = escape(get_text_content(block['code'].get('rich_text', [])))
+            language = block['code'].get('language') or 'plaintext'
             html_content.append(f"""
             <div class="code-block">
               <pre><code class="language-{language}">{code}</code></pre>
-              <button class="copy-button" aria-label="Copy code">Copy</button>
+              <button class="copy-button">Копировать</button>
             </div>
             """)
-        
+
         elif block_type == 'image':
             image_url = block['image']['file']['url']
             html_content.append(f"<img src='{image_url}' alt='Notion image' class='image-block'>")
-        
+
         elif block_type == 'divider':
             html_content.append("<hr>")
-        
+
         elif block_type == 'quote':
-            text = get_text_content(block['quote']['rich_text'])
+            text = get_text_content(block['quote'].get('rich_text', []))
             html_content.append(f"<blockquote>{text}</blockquote>")
-        
+
         elif block_type == 'callout':
-            emoji = block['callout']['icon']['emoji'] if block['callout']['icon']['type'] == 'emoji' else ''
-            text = get_text_content(block['callout']['rich_text'])
-            html_content.append(f"<div class='callout'>{emoji} {text}</div>")
-        
-        # Process child blocks if present
-        if 'has_children' in block and block['has_children']:
+            icon = block['callout']['icon'].get('emoji', '') if block['callout']['icon'].get('type') == 'emoji' else ''
+            text = get_text_content(block['callout'].get('rich_text', []))
+            html_content.append(f"<div class='callout'>{icon} {text}</div>")
+
+        # Обработка дочерних блоков
+        if block.get('has_children'):
             child_blocks = get_child_blocks(block['id'])
             html_content.extend(convert_to_html(child_blocks))
 
-    # Close any open list
     if list_type:
         html_content.append(f"</{list_type}>")
 
@@ -130,9 +118,13 @@ def convert_to_html(blocks):
 
 def get_child_blocks(block_id):
     url = f"https://api.notion.com/v1/blocks/{block_id}/children"
-    response = requests.get(url, headers=headers)
-    response.raise_for_status()
-    return response.json()['results']
+    try:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        return response.json().get('results', [])
+    except requests.RequestException as e:
+        logging.error(f"Error fetching child blocks: {e}")
+        return []
 
 def get_title(page_id):
     try:
@@ -143,30 +135,30 @@ def get_title(page_id):
 
         title_property = page_data.get("properties", {}).get("title", {}).get("title", [])
         if title_property:
-            return title_property[0]["text"]["content"]
+            return title_property[0].get("text", {}).get("content", "Untitled")
 
         logging.warning("Page title not found.")
-        return "Page Title"
+        return "Untitled"
 
     except requests.RequestException as e:
         logging.error(f"Error fetching page title: {e}")
-        raise
+        return "Untitled"
 
 def generate_toc(blocks):
     toc = []
     for block in blocks:
-        if block['type'].startswith('heading_'):
-            level = int(block['type'][-1])
-            text = get_text_content(block[block['type']]['rich_text'])
+        if block.get('type', '').startswith('heading_'):
+            level = int(block['type'].split('_')[-1])
+            text = get_text_content(block[block['type']].get('rich_text', []))
             heading_id = text.replace(" ", "-").lower()
             toc.append(f"<li class='toc-item toc-level-{level}'><a href='#{heading_id}'>{text}</a></li>")
-    return "<ul class='toc'>" + ''.join(toc) + "</ul>"
+    return "<ul class='toc-list'>" + ''.join(toc) + "</ul>"
 
 def generate_navigation(pages_data):
     nav_html = ""
     for i, (title, filename) in enumerate(pages_data):
         if i > 0:
-            nav_html += " | "  # Add separator for all except the first link
+            nav_html += " | "
         nav_html += f"<a href='{filename}.html'>{title}</a>"
     return nav_html
 
@@ -175,7 +167,7 @@ def save_html(toc, html_content, title, filename, navigation):
         with open('template.html', 'r', encoding='utf-8') as f:
             template = f.read()
 
-        full_html = template.replace('{{ title }}', title) \
+        full_html = template.replace('{{ title }}', escape(title)) \
                             .replace('{{ toc }}', toc) \
                             .replace('{{ content }}', html_content) \
                             .replace('{{ pages_navigation }}', navigation)
@@ -199,9 +191,7 @@ def main():
             title = get_title(page_id)
             toc = generate_toc(notion_content)
 
-            filename = f'page_{idx + 1}'
-            if idx == 0:
-                filename = 'index'
+            filename = 'index' if idx == 0 else f'page_{idx + 1}'
             pages_data.append((title, filename))
             save_html(toc, html_content, title, filename, '')
 
