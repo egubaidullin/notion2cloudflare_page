@@ -31,11 +31,11 @@ jobs:
 
       - name: Check for generated files
         run: |
-          if [ ! -f "index.html" ]; then
+          if [ ! -f "build/index.html" ]; then
             echo "index.html not found!"
             exit 1
           fi
-          if [ ! -f "template.html" ]; then
+          if [ ! -f "templates/template.html" ]; then
             echo "template.html not found!"
             exit 1
           fi
