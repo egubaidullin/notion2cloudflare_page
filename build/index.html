@@ -1,0 +1,420 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>Web-server</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+	</head>
+	<body class="is-preload">
+
+		<!-- Wrapper -->
+			<div id="wrapper">
+
+				<!-- Main -->
+					<div id="main">
+						<div class="inner">
+
+							<!-- Header -->
+								<header id="header">
+									
+									<ul class="icons">
+										<li><a href="#" class="icon brands fa-twitter"><span class="label">Twitter</span></a></li>
+									</ul>
+								</header>
+
+							<!-- Content -->
+								<section>
+									<header class="main">
+										<h1>Web-server</h1>
+									</header>
+									<div class="heading-block">
+    <h1 id="getting-a-nginx-sites-enabled-list" class="heading-level-{level}">
+        Getting a nginx sites-enabled list
+    </h1>
+</div>
+<div class="heading-block">
+    <h2 id="password-based-authentication" class="heading-level-{level}">
+        Password-based authentication
+    </h2>
+</div>
+<div class="paragraph-block">
+    To provide credentials, IP addresses, and SSH ports to the script, you can modify the servers.txt file to include the necessary information for each server. Here's how you can structure the servers.txt file:
+</div>
+<div class="paragraph-block">
+    <username>:<password>@<ip_address>:<ssh_port>
+</div>
+<div class="paragraph-block">
+    Make the script executable Save the changes to the shell script and run the following command to make it executable:
+</div>
+<div class="code-block">
+    <pre><code class="language-bash">chmod +x check_enabled_sites.sh</code></pre>
+    <button class="copy-button icon fa-clipboard" onclick="copyToClipboard(this)"></button>
+</div>
+<div class="paragraph-block">
+    check_enabled_sites.sh
+</div>
+<div class="code-block">
+    <pre><code class="language-bash">#!/bin/bash
+# set -x
+
+# Output file path
+output_file=&quot;srv_sites_list.txt&quot;
+
+# Log file path
+log_file=&quot;script_log.txt&quot;
+
+# Function to log messages
+log() {
+  local datetime=$(date +&quot;%Y-%m-%d %H:%M:%S&quot;)
+  echo &quot;[${datetime}] $1&quot; &gt;&gt; &quot;$log_file&quot;
+}
+
+# Read the list of servers from servers.txt
+while IFS=&#x27;@&#x27; read -r credentials server; do
+  username=$(echo &quot;$credentials&quot; | cut -d &#x27;:&#x27; -f 1)
+  password=$(echo &quot;$credentials&quot; | cut -d &#x27;:&#x27; -f 2)
+  ip_address=$(echo &quot;$server&quot; | cut -d &#x27;:&#x27; -f 1)
+  ssh_port=$(echo &quot;$server&quot; | cut -d &#x27;:&#x27; -f 2)
+
+  log &quot;Checking enabled sites on $ip_address...&quot;
+
+  # Use the extracted credentials, IP address, and SSH port in the SSH command
+  sshpass -p &quot;$password&quot; ssh -p &quot;$ssh_port&quot; -v &quot;$username@$ip_address&quot; &quot;ls /etc/nginx/sites-enabled&quot; &gt; output.log
+
+  # Save the result to the output file
+  result=$(cat output.log)
+  echo &quot;#-------------------------&quot; &gt;&gt; &quot;$output_file&quot;
+  echo &quot;#Server IP: $ip_address&quot; &gt;&gt; &quot;$output_file&quot;
+  echo &quot;#-------------------------&quot; &gt;&gt; &quot;$output_file&quot;
+  echo &quot;$result&quot; &gt;&gt; &quot;$output_file&quot;
+  echo &quot;#-------------------------&quot; &gt;&gt; &quot;$output_file&quot;
+
+  # Clean up temporary log file
+  rm output.log
+
+  log &quot;Completed checking enabled sites on $ip_address.&quot;
+done &lt; servers.txt</code></pre>
+    <button class="copy-button icon fa-clipboard" onclick="copyToClipboard(this)"></button>
+</div>
+<div class="paragraph-block">
+    In this script, the while loop reads each line from servers.txt and splits it into the credentials and server variables. Then, the username, password, ip_address, and ssh_port are extracted using the cut command. Finally, the SSH command is modified to include the extracted credentials, IP address, and SSH port using sshpass and the -p and -p options, -v option to the ssh command, which enables verbose mode and displays detailed information about the SSH connection process.
+</div>
+<div class="paragraph-block">
+    Remember to save the changes to both the servers.txt file and the check_enabled_sites.sh script. When you run the script, it will use the provided credentials, IP addresses, and SSH ports to connect to each server and check the enabled sites.
+</div>
+<div class="paragraph-block">
+    a variable output_file is added to specify the path and name of the output file. The script then uses echo commands to append the server IP and enabled sites information to the output file, following the specified format.
+</div>
+<div class="paragraph-block">
+    Make sure to update the servers.txt file with the desired server credentials, IP addresses, and SSH ports. When you run the script, it will connect to each server, check the enabled sites, and save the results to the specified output file ('servers_list.txt' in this example).
+</div>
+<div class="paragraph-block">
+    The script includes a log function that logs messages to a file named script_log.txt
+</div>
+<div class="paragraph-block">
+    The output of the ssh command, including the verbose information, is saved to a temporary log file named output.log
+</div>
+<div class="heading-block">
+    <h2 id="ssh-key-based-authentication-1" class="heading-level-{level}">
+        SSH key-based authentication 1
+    </h2>
+</div>
+<div class="code-block">
+    <pre><code class="language-bash">#!/bin/bash
+
+# Output file path
+output_file=&quot;srv_sites_list.txt&quot; 
+
+# Log file path
+log_file=&quot;script_log.txt&quot;
+
+# Function to log messages
+log() {
+  local datetime=$(date +&quot;%Y-%m-%d %H:%M:%S&quot;)
+  echo &quot;[${datetime}] $1&quot; &gt;&gt; &quot;$log_file&quot;
+}
+
+# Read the list of servers from servers.txt
+while IFS=&#x27;@&#x27; read -r username server; do
+
+  ip_address=$(echo &quot;$server&quot; | cut -d &#x27;:&#x27; -f 1)
+  ssh_port=$(echo &quot;$server&quot; | cut -d &#x27;:&#x27; -f 2)
+
+  log &quot;Checking enabled sites on $ip_address...&quot;
+
+  # Use SSH key instead of password
+  ssh -p &quot;$ssh_port&quot; -i /path/to/privatekey &quot;$username@$ip_address&quot; &quot;ls /etc/nginx/sites-enabled&quot; &gt; output.log
+
+  # Save the result to the output file
+  result=$(cat output.log)
+
+  echo &quot;#-------------------------&quot; &gt;&gt; &quot;$output_file&quot;
+  echo &quot;#Server IP: $ip_address&quot; &gt;&gt; &quot;$output_file&quot; 
+  echo &quot;#-------------------------&quot; &gt;&gt; &quot;$output_file&quot;
+  echo &quot;$result&quot; &gt;&gt; &quot;$output_file&quot;
+  echo &quot;#-------------------------&quot; &gt;&gt; &quot;$output_file&quot;
+
+  # Clean up temporary log file
+  rm output.log
+
+  log &quot;Completed checking enabled sites on $ip_address.&quot;
+
+done &lt; servers.txt</code></pre>
+    <button class="copy-button icon fa-clipboard" onclick="copyToClipboard(this)"></button>
+</div>
+<div class="heading-block">
+    <h2 id="ssh-key-based-authentication-2" class="heading-level-{level}">
+        SSH key-based authentication 2
+    </h2>
+</div>
+<div class="code-block">
+    <pre><code class="language-bash">#!/bin/bash
+
+# Переменная для выходного файла
+output_file=&quot;$1&quot;
+
+# Переменная для файла журнала
+log_file=&quot;$2&quot;
+
+# Переменная для файла со списком серверов
+servers_file=&quot;$3&quot;
+
+# Функция для записи сообщений в журнал
+log() {
+  local datetime
+  datetime=$(date +&quot;%Y-%m-%d %H:%M:%S&quot;)
+  echo &quot;[${datetime}] $1&quot; &gt;&gt; &quot;$log_file&quot;
+}
+
+# Читаем список серверов из файла, поданного на вход
+while read -r server; do
+
+  # Используем ssh для авторизации
+  ssh -i /path/to/privatekey &quot;$server&quot; &quot;ls /etc/nginx/sites-enabled&quot; &gt; output.log
+
+  # Сохраняем результат в выходной файл
+  result=$(cat output.log)
+
+  echo &quot;#-------------------------&quot; &gt;&gt; &quot;$output_file&quot;
+  echo &quot;#Server IP: $server&quot; &gt;&gt; &quot;$output_file&quot;
+  echo &quot;#-------------------------&quot; &gt;&gt; &quot;$output_file&quot;
+  echo &quot;$result&quot; &gt;&gt; &quot;$output_file&quot;
+  echo &quot;#-------------------------&quot; &gt;&gt; &quot;$output_file&quot;
+
+  # Удаляем временный файл журнала
+  rm output.log
+
+  log &quot;Завершена проверка включенных сайтов на $server.&quot;
+
+done &lt; &quot;$servers_file&quot;</code></pre>
+    <button class="copy-button icon fa-clipboard" onclick="copyToClipboard(this)"></button>
+</div>
+<div class="heading-block">
+    <h1 id="getting-recommended-php-fpm-param" class="heading-level-{level}">
+        Getting recommended php-fpm param
+    </h1>
+</div>
+<div class="code-block">
+    <pre><code class="language-bash">#!/bin/bash
+
+# Determine if max_children reached  
+sudo grep max_children /var/log/php7.4-fpm.log
+
+# Get pm params
+sudo grep -E &quot;pm.max_children...&quot; /etc/php/7.4/fpm/pool.d/www.conf
+
+# Calculate RAM and max child size
+total_ram=$(free -m | awk &#x27;/Mem/{print $2}&#x27;)
+max_child_size=$(ps aux | grep php-fpm | sort -k 6 -nr | awk &#x27;BEGIN{sum=0;count=0} {sum+=$6; count++} END{print sum/count/1024}&#x27;)
+
+echo &quot;Total RAM: $total_ram MB&quot;
+echo &quot;Max child size: $max_child_size MB&quot;
+
+# Calculate ratio 
+#ratio=$(bc &lt;&lt;&lt; &quot;scale=2; $total_ram/$max_child_size&quot;)
+ratio=$(bc &lt;&lt;&lt; &quot;scale=0; $total_ram/$max_child_size&quot;)
+#echo &quot;Ratio: $ratio&quot;
+
+# Calculate cores
+Cores=$(( $(lscpu | awk &#x27;/^Socket/{print $2}&#x27;) * $(lscpu | awk &#x27;/^Core/{print $4}&#x27;) ))
+echo &quot;Cores: $Cores&quot;
+
+# Recommended pm params
+pm_min_spare_servers=$((2 * $Cores))
+pm_start_servers=$((4 * $Cores)) 
+pm_max_spare_servers=$((4 * $Cores))
+
+echo &quot;Recommended settings:&quot;
+echo &quot;pm.min_spare_servers = $pm_min_spare_servers&quot; 
+echo &quot;pm.start_servers = $pm_start_servers&quot;
+echo &quot;pm.max_spare_servers = $pm_max_spare_servers&quot;
+echo &quot;pm.max_children: $ratio&quot;
+echo &quot;/etc/php/7.4/fpm/pool.d/www.conf&quot;</code></pre>
+    <button class="copy-button icon fa-clipboard" onclick="copyToClipboard(this)"></button>
+</div>
+<div class="heading-block">
+    <h1 id="getting-a-nginx-sites-enabled-list-by-ansible" class="heading-level-{level}">
+        Getting a nginx sites-enabled list by Ansible
+    </h1>
+</div>
+<div class="paragraph-block">
+    Create the ansible.cfg:
+</div>
+<div class="code-block">
+    <pre><code class="language-bash">[defaults]
+stdout_callback = yaml
+host_key_checking = False #Do not detect host key</code></pre>
+    <button class="copy-button icon fa-clipboard" onclick="copyToClipboard(this)"></button>
+</div>
+<div class="paragraph-block">
+    The Bash script parse_ansible.sh converts a text file that contains a server list to Ansible format:
+</div>
+<div class="code-block">
+    <pre><code class="language-bash">#!/bin/bash
+
+# Путь к файлу с серверами
+SERVERS_FILE=&quot;servers.txt&quot; 
+
+# Путь куда сохранить inventory
+INVENTORY_FILE=&quot;inventory.ini&quot;
+
+# Очищаем inventory файл 
+&gt; $INVENTORY_FILE
+
+echo &quot;[webservers]&quot; &gt;&gt; $INVENTORY_FILE
+
+# Читаем servers.txt
+while read -r line; do
+
+  # Разбиваем строку
+  ip=$(echo $line | awk &#x27;{print $1}&#x27;)
+  port=$(echo $line | awk &#x27;{print $2}&#x27;)
+  user=$(echo $line | awk &#x27;{print $3}&#x27;)
+  pass=$(echo $line | awk &#x27;{print $4}&#x27;)
+
+  # Добавляем хост в inventory
+  echo &quot;$ip ansible_port=$port ansible_user=$user ansible_ssh_pass=$pass&quot; &gt;&gt; $INVENTORY_FILE
+
+done &lt; $SERVERS_FILE
+
+echo &quot;Inventory file saved: $INVENTORY_FILE&quot;</code></pre>
+    <button class="copy-button icon fa-clipboard" onclick="copyToClipboard(this)"></button>
+</div>
+<div class="paragraph-block">
+    servers list:
+
+</div>
+<div class="code-block">
+    <pre><code class="language-plain text">xxx.xxx.xxx.xxx port login password</code></pre>
+    <button class="copy-button icon fa-clipboard" onclick="copyToClipboard(this)"></button>
+</div>
+<div class="paragraph-block">
+    To run the ansible playbook nginx.yml, use the following command:
+ansible-playbook -i inventory.ini nginx2.yml
+</div>
+<div class="code-block">
+    <pre><code class="language-plain text">---
+- hosts: all
+  gather_facts: no
+
+  tasks:
+
+  - name: Get list of sites
+    command: ls /etc/nginx/sites-enabled
+    register: nginx_sites
+
+  - name: Get working directory
+    command: pwd
+    register: workdir
+
+  - name: Filter out non-site entries
+    set_fact:
+      filtered_sites: &quot;{{ nginx_sites.stdout_lines | reject(&#x27;search&#x27;,&#x27;\\.(json)$&#x27;) | reject(&#x27;regex&#x27;, &#x27;^[^.]+$&#x27;) | list }}&quot;
+
+  - debug:
+      var: filtered_sites
+
+  - copy:
+      content: |
+        {% for site in filtered_sites %}
+        {{ site }}
+        {% endfor %}
+      dest: &quot;{{ workdir.stdout }}/nginx_sites.txt&quot;
+
+  - name: Create websites directory
+    become: yes
+    file:
+      path: &quot;{{ playbook_dir }}/websites&quot;
+      state: directory
+
+  - name: Copy the file to local machine
+    copy:
+      src: &quot;{{ workdir.stdout }}/nginx_sites.txt&quot;
+      dest: &quot;{{ playbook_dir }}/websites/nginx_sites.txt&quot;
+      remote_src: yes
+
+  - name: Fetch the file to local machine
+    fetch:
+      src: &quot;{{ workdir.stdout }}/nginx_sites.txt&quot;
+      dest: &quot;{{ playbook_dir }}/websites/{{ inventory_hostname }}_nginx_sites.txt&quot;
+      flat: yes</code></pre>
+    <button class="copy-button icon fa-clipboard" onclick="copyToClipboard(this)"></button>
+</div>
+<div class="paragraph-block">
+    
+</div>
+								</section>
+
+						</div>
+					</div>
+
+				<!-- Sidebar -->
+					<div id="sidebar">
+						<div class="inner">
+
+
+							<!-- Menu -->
+								<nav id="menu">
+									<header class="major">
+										<h2>Menu</h2>
+									</header>
+									<!-- templates/blocks/toc.html -->
+<ul>
+    
+        <!-- templates/blocks/toc_item.html -->
+<li>
+    <a href="#getting-a-nginx-sites-enabled-list">Getting a nginx sites-enabled list</a>
+</li>
+    
+        <!-- templates/blocks/toc_item.html -->
+<li>
+    <a href="#getting-recommended-php-fpm-param">Getting recommended php-fpm param</a>
+</li>
+    
+        <!-- templates/blocks/toc_item.html -->
+<li>
+    <a href="#getting-a-nginx-sites-enabled-list-by-ansible">Getting a nginx sites-enabled list by Ansible</a>
+</li>
+    
+</ul>
+								</nav>
+
+							<!-- Footer -->
+								<footer id="footer">
+									<p class="copyright">&copy; egub.win 2024. All rights reserved.</p>
+								</footer>
+						</div>
+					</div>
+			</div>
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+			<script src="assets/js/custom.js"></script>
+
+	</body>
+</html>

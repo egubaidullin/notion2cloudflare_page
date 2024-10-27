@@ -1,0 +1,8 @@
+classes:
+  paragraph: "paragraph-block"
+  heading: "heading-block"
+  heading_level: "heading-level-{level}"
+  code_block: "code-block"
+  copy_button: "copy-button icon fa-clipboard"
+  image_block: "image-block"
+  callout: "callout-block"

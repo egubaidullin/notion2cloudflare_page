@@ -1,0 +1,11 @@
+classes:
+  paragraph: "paragraph-block"
+  heading: "heading-block"
+  heading_level: "heading-level-{level}"
+  code_block: "code-block"
+  copy_button: "copy-button icon fa-clipboard"
+  image_block: "image-block"
+  callout: "callout-block"
+  toc: "table-of-contents"
+  toc_item: "toc-item"
+  list_item: "list-item"
