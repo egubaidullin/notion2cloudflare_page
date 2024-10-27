@@ -1,7 +1,6 @@
 import os
 import logging
 from typing import List, Tuple
-from dotenv import load_dotenv
 from notion_client import NotionClient
 from template_engine import TemplateEngine
 from html_renderer import HTMLRenderer
@@ -21,7 +20,6 @@ def main():
     )
 
     # Загрузка переменных окружения
-    load_dotenv()
     notion_token = os.getenv('NOTION_API_TOKEN')
     page_ids = os.getenv('NOTION_PAGE_IDS', '').split(',')
 
