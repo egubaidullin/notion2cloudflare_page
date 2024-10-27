@@ -19,9 +19,7 @@ def generate_navigation(pages_data: List[Tuple[str, str]], template_engine) -> s
 
 def main():
     # Настройка логирования
-    logging.basicConfig(
-        level=logging.INFO,
-    )
+    logging.basicConfig(level=logging.INFO)
 
     # Загрузка переменных окружения
     notion_token = os.getenv('NOTION_API_TOKEN')
@@ -39,21 +37,29 @@ def main():
 
         # Обработка страниц
         pages_data = []
+        
         for idx, page_id in enumerate(page_ids):
             logging.info(f"Processing page {page_id}")
-            
+
             # Получение данных страницы
             notion_content = notion_client.get_page_content(page_id)
             html_content = html_renderer.convert_to_html(notion_content)
             title = notion_client.get_page_title(page_id)
             toc = html_renderer.generate_toc(notion_content)
-            
+
             # Генерация имени файла
             filename = 'index' if idx == 0 else f'page_{idx + 1}'
             pages_data.append((title, filename))
-            
-            # Сохранение страницы с навигацией
-            navigation = generate_navigation(pages_data, template_engine)
+
+        # Генерация навигации после обработки всех страниц
+        navigation = generate_navigation(pages_data, template_engine)
+
+        # Сохранение всех страниц с одной и той же навигацией
+        for title, filename in pages_data:
+            notion_content = notion_client.get_page_content(page_id)
+            html_content = html_renderer.convert_to_html(notion_content)
+            toc = html_renderer.generate_toc(notion_content)
+
             file_manager.save_html(
                 filename,
                 template_engine.render_page('template.html',
